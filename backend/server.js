@@ -4,28 +4,38 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
-
-// Initialize app
 const app = express();
 dotenv.config();
 
-// Middleware
-app.use(cors());
+const allowedOrigins = ['http://localhost:3000'];
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+}));
+
 app.use(express.json());
 
-// Sample route
 app.get('/', (req, res) => {
-  res.send('Server is running');
+    res.send('Server is running with updated CORS settings');
 });
-// Import and use auth routes
-const authRoutes = require('./routes/authRoutes');
-app.use('/api/auth', authRoutes); // All auth-related routes will start with "/api/auth"
 
-// Database connection (MongoDB Atlas)
+const authRoutes = require('./routes/authRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
+const userRoutes = require('./routes/userRoutes'); // Add this
+
+app.use('/api/auth', authRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/user', userRoutes); // Mount user routes
+
 connectDB();
 
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-console.log('JWT Secret:', process.env.JWT_SECRET);
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

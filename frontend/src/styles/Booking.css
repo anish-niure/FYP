@@ -1,0 +1,83 @@
+/* Booking.css */
+.booking-page {
+    background-color: var(--primary-bg, #121212);
+    color: var(--text-light, #ccc);
+    min-height: 100vh;
+    padding: var(--spacing-lg, 60px) var(--spacing-md, 20px);
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.booking-page h1 {
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    color: var(--gold-accent, #ffd700);
+    margin-bottom: var(--spacing-md, 20px);
+    font-weight: 700;
+}
+
+.booking-page form {
+    background-color: var(--card-bg, #1a1a1a);
+    padding: var(--spacing-md, 20px);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.booking-page div {
+    margin-bottom: var(--spacing-sm, 15px);
+    text-align: left;
+}
+
+.booking-page label {
+    display: block;
+    color: var(--text-white, #ffffff);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm, 15px);
+}
+
+.booking-page select,
+.booking-page input[type="text"],
+.booking-page button {
+    width: 100%;
+    padding: var(--spacing-sm, 15px);
+    font-size: 1rem;
+    border: 1px solid var(--gold-accent, #ffd700);
+    border-radius: 8px;
+    background-color: var(--primary-bg, #121212);
+    color: var(--text-light, #ccc);
+    box-sizing: border-box;
+}
+
+.booking-page select:focus,
+.booking-page input[type="text"]:focus {
+    outline: none;
+    border-color: var(--gold-accent, #ffd700);
+    box-shadow: 0 0 5px var(--shadow-color, rgba(255, 215, 0, 0.3));
+}
+
+.booking-page .react-datepicker-wrapper {
+    width: 100%;
+}
+
+.booking-page button {
+    background-color: var(--card-bg, #1a1a1a);
+    color: var(--gold-accent, #ffd700);
+    cursor: pointer;
+    transition: background-color var(--transition-ease, 0.3s ease), color var(--transition-ease, 0.3s ease), transform var(--transition-ease, 0.3s ease);
+}
+
+.booking-page button:hover {
+    background-color: var(--gold-accent, #ffd700);
+    color: var(--primary-bg, #121212);
+    transform: translateY(-2px);
+}
+
+.booking-page p {
+    color: red;
+    margin-top: var(--spacing-sm, 15px);
+}

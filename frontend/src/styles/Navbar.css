@@ -1,0 +1,151 @@
+/* Overall Navbar Layout */
+.navbar {
+    position: fixed;               /* Stays at the top while scrolling */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;                  /* Fixed height for the navbar */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgba(135, 135, 135, 0.5); /* Slightly transparent dark gray */
+    padding: 0 0rem;
+    font-family: sans-serif;
+    z-index: 9999;  
+                   /* Ensures the navbar is above other elements */
+}
+
+/* If your main content disappears behind the navbar,
+   add margin-top in your global or body CSS:
+   body {
+     margin-top: 60px;
+   }
+*/
+
+/* Left side: includes the dropdown container */
+.nav-left {
+    display: flex;
+    align-items: center;
+    margin-left: 2rem;
+}
+
+/* Dropdown container for the menu icon */
+.dropdown-container {
+    position: relative;
+    display: inline-block;
+}
+
+/* The menu icon */
+.menu-icon {
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+}
+
+/* Dropdown menu initially hidden */
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    background-color: rgba(34, 34, 34, 0.95); /* Slightly transparent dark bg */
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 0;
+    min-width: 140px;
+    border-radius: 0.3rem;                /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+    
+    /* Fade and slide in effect */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+
+/* Reveal dropdown on hover with fade-in/slide-in */
+.dropdown-container:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Dropdown items */
+.dropdown-menu li {
+    padding: 0.5rem 1rem;
+}
+
+.dropdown-menu li a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+/* Gold text on hover */
+.dropdown-menu li a:hover {
+    color: #FFD700;
+}
+
+/* Center Section: truly center the text */
+.nav-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    height: 100%; /* Ensures it takes full height of the navbar */
+}
+
+/* Logo styling */
+.nav-logo {
+    height: 200px;  /* Adjusted size for optimal fit */
+    width: auto;
+    max-width: 200px; /* Prevents excessive width */
+}
+
+/* Right side: store/profile icons */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem; /* Enough space so icons aren't jammed */
+    margin-right: 2rem;
+}
+
+/* Icon links */
+.icon-link {
+    text-decoration: none;
+}
+
+/* Icons: if your icons are white by default,
+   this filter turns them gold; remove if not needed. */
+.nav-icon {
+    width: 24px;
+    height: 24px;
+    filter:   saturate(459%)
+             brightness(101%) contrast(100%);
+    transition: transform 0.2s ease;
+}
+
+.nav-icon:hover {
+    transform: scale(1.5);
+}
+.logout-button {
+    background-color: #1a1a1a;
+    color: #ffd700;
+    border: 2px solid #ffd700;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+.logout-button:hover {
+    background-color: #ffd700;
+    color: #121212;
+    transform: translateY(-2px);
+}
+.hover-logout {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 5px;
+    z-index: 1001;
+}

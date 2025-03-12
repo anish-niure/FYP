@@ -1,0 +1,144 @@
+/* Existing CSS remains unchanged */
+.profile-container {
+  padding: 60px 20px;
+  background-color: #121212;
+  color: #ccc;
+  min-height: 100vh;
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+}
+
+.profile-container h1 {
+  color: #ffd700;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.profile-info {
+  background-color: #1a1a1a;
+  padding: 20px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 60px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.profile-picture {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+  border: 2px solid #ffd700;
+}
+
+.profile-picture-input {
+  margin-bottom: 15px;
+}
+
+.edit-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ffd700;
+  border-radius: 8px;
+  background-color: #121212;
+  color: #ccc;
+}
+
+.profile-info p {
+  margin: 15px 0;
+  color: #ffffff;
+}
+
+.edit-button,
+.save-button,
+.cancel-button {
+  background-color: #1a1a1a;
+  color: #ffd700;
+  border: 2px solid #ffd700;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+  margin: 10px;
+}
+
+.edit-button:hover,
+.save-button:hover,
+.cancel-button:hover {
+  background-color: #ffd700;
+  color: #121212;
+  transform: translateY(-2px);
+}
+
+.booking-history,
+.purchases-section {
+  margin-top: 60px;
+}
+
+.booking-history h2,
+.purchases-section h2 {
+  color: #ffd700;
+  margin-bottom: 20px;
+}
+
+.booking-history table {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  border-collapse: collapse;
+  background-color: #1a1a1a;
+  border: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.booking-history th,
+.booking-history td {
+  border: 1px solid rgba(255, 215, 0, 0.1);
+  padding: 15px;
+  text-align: left;
+  color: #ffffff;
+}
+
+.booking-history th {
+  background-color: #121212;
+  color: #ffd700;
+}
+
+.booking-history tr:nth-child(even) {
+  background-color: rgba(255, 215, 0, 0.05);
+}
+
+.purchases-section p {
+  color: #ccc;
+}
+
+.purchases-section a {
+  color: #ffd700;
+  text-decoration: none;
+}
+
+.purchases-section a:hover {
+  text-decoration: underline;
+}
+
+/* New styling for profile logout button */
+.profile-logout {
+  background-color: #1a1a1a;
+  color: #ffd700;
+  border: 2px solid #ffd700;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+  margin-top: 20px;
+}
+
+.profile-logout:hover {
+  background-color: #ffd700;
+  color: #121212;
+  transform: translateY(-2px);
+}
