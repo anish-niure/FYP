@@ -1,0 +1,65 @@
+.stylist-dashboard {
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.profile-section, .bookings-section {
+    margin-bottom: 40px;
+}
+
+.error {
+    color: red;
+}
+
+.edit-input {
+    padding: 5px;
+    margin-right: 10px;
+}
+
+.save-button, .cancel-button, .edit-button, .approve-button {
+    padding: 5px 15px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.save-button {
+    background: #28a745;
+    color: white;
+}
+
+.cancel-button {
+    background: #dc3545;
+    color: white;
+}
+
+.edit-button {
+    background: #007bff;
+    color: white;
+}
+
+.approve-button {
+    background: #17a2b8;
+    color: white;
+}
+
+.approve-button:hover {
+    background: #138496;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background: #f4f4f4;
+}

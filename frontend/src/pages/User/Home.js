@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import Header from '../../components/Header';
+import Header from '../../components/Header'; // Adjust path if different
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import Modal from '../../components/Modal';
-import '../../styles/Home.css'; 
+import '../../styles/Home.css';
 
-const Home = () => {
+const Home = ({ openModal }) => { // Receive openModal from App.js
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     return (
         <div className="home">
-            <Navbar openModal={() => setIsModalOpen(true)} />
-            <Header />
+            <Navbar openModal={openModal} /> {/* Already passing openModal */}
+            <Header openModal={openModal} /> {/* Pass openModal to Header */}
             <div className="content">
                 <section className="services">
                     <h2>Our Services</h2>

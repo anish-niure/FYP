@@ -102,3 +102,20 @@
     text-align: center;
     margin-top: 10px;
   }
+  .password-container {
+    position: relative;
+    width: 100%;
+  }
+  
+  /* Ensure the password input has padding to accommodate the eye icon */
+  .password-container input[type="password"],
+  .password-container input[type="text"] {
+    width: 100%;
+    padding-right: 40px; /* Space for the eye icon */
+    box-sizing: border-box;
+  }
+  
+  /* Style for the eye icon */
+  .eye-icon {
+    user-select: none; /* Prevent text selection */
+  }

@@ -1,167 +1,164 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import '../../styles/Booking.css'; // Create this file for styling
+import axios from 'axios';
+import '../../styles/Booking.css';
 
 const Booking = () => {
-    const navigate = useNavigate();
-    const [selectedService, setSelectedService] = useState('');
-    const [selectedStylist, setSelectedStylist] = useState('');
-    const [locationType, setLocationType] = useState('Salon');
-    const [selectedDate, setSelectedDate] = useState(null);
+    const [services, setServices] = useState([]);
+    const [stylists, setStylists] = useState([]);
+    const [formData, setFormData] = useState({
+        service: '',
+        stylist: '',
+        locationType: 'Salon',
+        dateTime: '',
+    });
     const [availableSlots, setAvailableSlots] = useState([]);
-    const [selectedSlot, setSelectedSlot] = useState('');
     const [error, setError] = useState('');
 
-    // Hardcoded services and stylists
-    const services = [
-        'Haircut & Styling',
-        'Massage Therapy',
-        'Manicure & Pedicure',
-    ];
-    const stylists = [
-        'Sophia Carter',
-        'Michael Brown',
-        'Emily Johnson',
-        'Alex Rodriguez',
-        'Olivia Davis',
-    ];
-
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            navigate('/');
+        // Fetch services
+        axios
+            .get('http://localhost:5001/api/bookings/services')
+            .then((response) => {
+                setServices(response.data);
+                setError(''); // Clear any previous error
+            })
+            .catch((err) => {
+                setError('Failed to load services: ' + (err.response?.data?.message || err.message));
+            });
+
+        // Fetch stylists
+        axios
+            .get('http://localhost:5001/api/bookings/stylists')
+            .then((response) => {
+                setStylists(response.data);
+                setError(''); // Clear any previous error
+            })
+            .catch((err) => {
+                setError('Failed to load stylists: ' + (err.response?.data?.message || err.message));
+            });
+    }, []);
+
+    const handleDateChange = async (e) => {
+        const date = e.target.value;
+        setFormData({ ...formData, dateTime: date });
+        if (!date) {
+            setAvailableSlots([]);
             return;
         }
-
-        if (selectedDate) {
-            fetchAvailability();
-        }
-    }, [selectedDate, navigate]);
-
-    const fetchAvailability = async () => {
-        const token = localStorage.getItem('token');
-        const dateStr = selectedDate.toISOString().split('T')[0]; // YYYY-MM-DD
         try {
-            const response = await fetch(`http://localhost:5001/api/bookings/availability?date=${dateStr}`, {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
-            const data = await response.json();
-            if (response.ok) {
-                const bookedSlots = data.bookedSlotsByStylist[selectedStylist] || [];
-                const freeSlots = data.allSlots.filter(slot => !bookedSlots.includes(slot));
-                setAvailableSlots(freeSlots);
-            } else {
-                setError(data.message || 'Failed to fetch availability.');
-            }
+            const response = await axios.get(
+                `http://localhost:5001/api/bookings/availability?date=${date}`,
+                {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                }
+            );
+            setAvailableSlots(response.data.allSlots || []);
+            setError('');
         } catch (err) {
-            setError('Error fetching availability.');
+            setError('Failed to fetch availability: ' + (err.response?.data?.message || err.message));
+            setAvailableSlots([]);
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!selectedService || !selectedStylist || !selectedSlot) {
-            setError('Please fill all fields.');
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setError('Please log in to book an appointment.');
+            return;
+        }
+        if (!formData.service || !formData.stylist || !formData.dateTime) {
+            setError('Please fill in all required fields.');
             return;
         }
 
-        const token = localStorage.getItem('token');
-        const dateTime = new Date(selectedDate);
-        const [hours] = selectedSlot.split(':');
-        dateTime.setHours(parseInt(hours, 10), 0, 0, 0);
-
         try {
-            const response = await fetch('http://localhost:5001/api/bookings', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    service: selectedService,
-                    stylist: selectedStylist,
-                    locationType,
-                    dateTime: dateTime.toISOString(),
-                }),
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                alert('Booking successful!');
-                navigate('/profile');
-            } else {
-                setError(data.message || 'Booking failed.');
-            }
+            await axios.post(
+                'http://localhost:5001/api/bookings',
+                formData,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            alert('Booking created successfully!');
+            setFormData({ service: '', stylist: '', locationType: 'Salon', dateTime: '' });
+            setAvailableSlots([]);
+            setError('');
         } catch (err) {
-            setError('Error submitting booking.');
+            setError('Failed to create booking: ' + (err.response?.data?.message || err.message));
         }
     };
 
     return (
         <div className="booking-page">
             <h1>Book an Appointment</h1>
+            {error && <p className="error">{error}</p>}
             <form onSubmit={handleSubmit}>
                 <div>
                     <label>Service:</label>
-                    <select value={selectedService} onChange={(e) => setSelectedService(e.target.value)}>
+                    <select
+                        value={formData.service}
+                        onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+                        required
+                    >
                         <option value="">Select a service</option>
                         {services.map((service) => (
-                            <option key={service} value={service}>{service}</option>
+                            <option key={service._id} value={service.name}>
+                                {service.name}
+                            </option>
                         ))}
                     </select>
                 </div>
-
                 <div>
                     <label>Stylist:</label>
                     <select
-                        value={selectedStylist}
-                        onChange={(e) => {
-                            setSelectedStylist(e.target.value);
-                            if (selectedDate) fetchAvailability();
-                        }}
+                        value={formData.stylist}
+                        onChange={(e) => setFormData({ ...formData, stylist: e.target.value })}
+                        required
                     >
                         <option value="">Select a stylist</option>
                         {stylists.map((stylist) => (
-                            <option key={stylist} value={stylist}>{stylist}</option>
+                            <option key={stylist._id} value={stylist._id}>
+                                {stylist.username}
+                            </option>
                         ))}
                     </select>
                 </div>
-
                 <div>
                     <label>Location:</label>
-                    <select value={locationType} onChange={(e) => setLocationType(e.target.value)}>
-                        <option value="Salon">Salon Service</option>
+                    <select
+                        value={formData.locationType}
+                        onChange={(e) => setFormData({ ...formData, locationType: e.target.value })}
+                    >
+                        <option value="Salon">Salon</option>
                         <option value="Home">Home Service</option>
                     </select>
                 </div>
-
                 <div>
-                    <label>Date:</label>
-                    <DatePicker
-                        selected={selectedDate}
-                        onChange={(date) => setSelectedDate(date)}
-                        minDate={new Date()}
-                        excludeDates={[]}
-                        placeholderText="Select a date"
+                    <label>Date & Time:</label>
+                    <input
+                        type="datetime-local"
+                        value={formData.dateTime}
+                        onChange={handleDateChange}
+                        required
                     />
                 </div>
-
-                {selectedDate && selectedStylist && (
+                {availableSlots.length > 0 && (
                     <div>
-                        <label>Time Slot:</label>
-                        <select value={selectedSlot} onChange={(e) => setSelectedSlot(e.target.value)}>
-                            <option value="">Select a time slot</option>
-                            {availableSlots.map((slot) => (
-                                <option key={slot} value={slot}>{slot}</option>
+                        <label>Available Slots:</label>
+                        <select
+                            value={formData.dateTime}
+                            onChange={(e) =>
+                                setFormData({ ...formData, dateTime: e.target.value })
+                            }
+                        >
+                            {availableSlots.map((slot, index) => (
+                                <option key={index} value={slot}>
+                                    {slot}
+                                </option>
                             ))}
                         </select>
                     </div>
                 )}
-
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                <button type="submit">Confirm Booking</button>
+                <button type="submit">Book Now</button>
             </form>
         </div>
     );

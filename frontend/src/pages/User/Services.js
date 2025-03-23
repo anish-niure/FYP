@@ -1,50 +1,57 @@
-import React from 'react';
-import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 import '../../styles/Service.css';
 
 const Services = () => {
+  const [services, setServices] = useState([]);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
+  const fetchServices = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get('http://localhost:5001/api/services', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setServices(res.data.map(service => ({
+        ...service,
+        imageUrl: service.imageUrl || 'https://placehold.co/150x150', // Same placeholder as products
+      })));
+      setError('');
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      setError(error.response?.data?.message || 'Failed to fetch services. Please try again.');
+      if (error.response?.status === 401) {
+        navigate('/'); // Redirect to login if unauthorized
+      }
+    }
+  };
+
   return (
-    <div className="services-page">
-      {/* Navbar at the top */}
-      <Navbar />
-      
-      <div className="services-content">
-        <h2>Our Services</h2>
-        <div className="services-list">
-          <div className="service-item">
-            <img
-              src="https://images.unsplash.com/photo-1559599101-f09722fb4948?q=80&w=2669&auto=format&fit=crop"
-              alt="Haircut & Styling"
-            />
-            <h3>Haircut & Styling</h3>
-            <p>Experience the latest trends in haircuts and styles.</p>
-          </div>
-
-          <div className="service-item">
-            <img
-              src="https://images.unsplash.com/photo-1542848284-8afa78a08ccb?q=80&w=2572&auto=format&fit=crop"
-              alt="Massage Therapy"
-            />
-            <h3>Massage Therapy</h3>
-            <p>Relax and unwind with our soothing massage services.</p>
-          </div>
-
-          <div className="service-item">
-            <img
-              src="https://images.unsplash.com/photo-1618328769009-b1a3e561f5e8?q=80&w=2670&auto=format&fit=crop"
-              alt="Manicure & Pedicure"
-            />
-            <h3>Manicure & Pedicure</h3>
-            <p>Keep your nails healthy and beautiful.</p>
-          </div>
-          
-          {/* ...Add more as needed... */}
-        </div>
+    <div className="services-container">
+      <h1>Available Services</h1>
+      {error && <div className="error-message">{error}</div>}
+      <div className="services-list">
+        {services.length === 0 ? (
+          <p>No services available.</p>
+        ) : (
+          services.map((service) => (
+            <div key={service._id} className="service-card">
+              <img src={service.imageUrl} alt={service.name} className="service-image" />
+              <h3>{service.name}</h3>
+              <p>{service.priceRange}</p>
+              <Link to={`/booking/${service._id}`} className="book-now-btn">
+                Book Now
+              </Link>
+            </div>
+          ))
+        )}
       </div>
-
-      {/* Footer at the bottom */}
-      <Footer />
     </div>
   );
 };

@@ -17,12 +17,13 @@
 
 /* If your main content disappears behind the navbar,
    add margin-top in your global or body CSS:
-   body {
-     margin-top: 60px;
-   }
-*/
+   
+*
 
 /* Left side: includes the dropdown container */
+.body {
+    margin-top: 100px;
+  }
 .nav-left {
     display: flex;
     align-items: center;

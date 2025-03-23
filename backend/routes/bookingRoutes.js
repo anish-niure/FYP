@@ -1,38 +1,26 @@
 const express = require('express');
 const router = express.Router();
 const Booking = require('../models/Booking');
-const jwt = require('jsonwebtoken');
+const Service = require('../models/Service');
+const User = require('../models/User');
+const { authenticate } = require('../middleware/authMiddleware');
 
-// Middleware to verify JWT
-const verifyToken = (req, res, next) => {
-    const token = req.header('Authorization');
-    if (!token) return res.status(401).json({ message: 'Access denied. No token provided.' });
-
-    try {
-        const decoded = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET);
-        req.user = decoded;
-        next();
-    } catch (err) {
-        res.status(400).json({ message: 'Invalid token.' });
-    }
-};
-
-// Salon hours (for validation)
+// Salon hours
 const salonHours = {
-    'Monday': { start: 9, end: 19 }, // 9 AM - 7 PM
+    'Monday': { start: 9, end: 19 },
     'Tuesday': { start: 9, end: 19 },
     'Wednesday': { start: 9, end: 19 },
     'Thursday': { start: 9, end: 19 },
     'Friday': { start: 9, end: 19 },
-    'Saturday': { start: 10, end: 17 }, // 10 AM - 5 PM
-    'Sunday': { start: null, end: null }, // Closed
+    'Saturday': { start: 10, end: 17 },
+    'Sunday': { start: null, end: null },
 };
 
 // Generate 1-hour slots
 const generateSlots = (date) => {
     const dayName = date.toLocaleString('en-US', { weekday: 'long' });
     const { start, end } = salonHours[dayName];
-    if (!start) return []; // Closed on Sundays
+    if (!start) return [];
 
     const slots = [];
     for (let hour = start; hour < end; hour++) {
@@ -42,79 +30,114 @@ const generateSlots = (date) => {
     return slots;
 };
 
+// GET all services (public)
+router.get('/services', async (req, res) => {
+    try {
+        const services = await Service.find();
+        res.json(services);
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch services.' });
+    }
+});
+
+// GET all stylists (public)
+router.get('/stylists', async (req, res) => {
+    try {
+        const stylists = await User.find({ role: 'stylist' }).select('username email');
+        res.json(stylists);
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch stylists.' });
+    }
+});
+
 // GET available slots for a date
-router.get('/availability', verifyToken, async (req, res) => {
-    const { date } = req.query; // e.g., "2025-03-15"
+router.get('/availability', authenticate, async (req, res) => {
+    const { date } = req.query;
     if (!date) return res.status(400).json({ message: 'Date is required.' });
 
-    const selectedDate = new Date(date);
-    const allSlots = generateSlots(selectedDate);
+    try {
+        const selectedDate = new Date(date);
+        const slots = generateSlots(selectedDate);
+        const bookings = await Booking.find({
+            dateTime: {
+                $gte: new Date(selectedDate.setHours(0, 0, 0, 0)),
+                $lt: new Date(selectedDate.setHours(23, 59, 59, 999)),
+            },
+        });
 
-    // Fetch bookings for the date
-    const startOfDay = new Date(selectedDate.setHours(0, 0, 0, 0));
-    const endOfDay = new Date(selectedDate.setHours(23, 59, 59, 999));
-    const bookings = await Booking.find({
-        dateTime: { $gte: startOfDay, $lte: endOfDay },
-    });
-
-    // Filter out booked slots (considering stylist availability)
-    const bookedSlotsByStylist = {};
-    bookings.forEach((booking) => {
-        const time = booking.dateTime.toTimeString().slice(0, 5); // e.g., "14:00"
-        if (!bookedSlotsByStylist[booking.stylist]) {
-            bookedSlotsByStylist[booking.stylist] = [];
-        }
-        bookedSlotsByStylist[booking.stylist].push(time);
-    });
-
-    res.json({ allSlots, bookedSlotsByStylist });
+        const bookedSlots = bookings.map(b => b.dateTime.toTimeString().slice(0, 5));
+        const availableSlots = slots.filter(slot => !bookedSlots.includes(slot));
+        res.json(availableSlots);
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch availability.' });
+    }
 });
 
 // POST create a booking
-router.post('/', verifyToken, async (req, res) => {
+router.post('/', authenticate, async (req, res) => {
     const { service, stylist, locationType, dateTime } = req.body;
 
     if (!service || !stylist || !locationType || !dateTime) {
         return res.status(400).json({ message: 'All fields are required.' });
     }
 
-    const bookingDateTime = new Date(dateTime);
-    const dayName = bookingDateTime.toLocaleString('en-US', { weekday: 'long' });
-    const hour = bookingDateTime.getHours();
-
-    // Validate salon hours (skip for Home Service)
-    if (locationType === 'Salon') {
-        const { start, end } = salonHours[dayName];
-        if (!start || hour < start || hour >= end) {
-            return res.status(400).json({ message: 'Selected time is outside salon hours.' });
-        }
+    try {
+        const booking = new Booking({
+            userId: req.user.id,
+            service,
+            stylist,
+            locationType,
+            dateTime: new Date(dateTime),
+        });
+        await booking.save();
+        res.status(201).json({ message: 'Booking created successfully!', booking });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to create booking.' });
     }
-
-    // Check for existing booking
-    const existingBooking = await Booking.findOne({
-        stylist,
-        dateTime: bookingDateTime,
-    });
-    if (existingBooking) {
-        return res.status(400).json({ message: 'This slot is already booked.' });
-    }
-
-    const booking = new Booking({
-        userId: req.user.id,
-        service,
-        stylist,
-        locationType,
-        dateTime: bookingDateTime,
-    });
-
-    await booking.save();
-    res.status(201).json({ message: 'Booking created successfully!', booking });
 });
 
 // GET user's booking history
-router.get('/user', verifyToken, async (req, res) => {
-    const bookings = await Booking.find({ userId: req.user.id }).sort({ dateTime: -1 });
-    res.json(bookings);
+router.get('/user', authenticate, async (req, res) => {
+    try {
+        const bookings = await Booking.find({ userId: req.user.id })
+            .populate('stylist', 'username email')
+            .sort({ dateTime: 1 });
+        res.json(bookings);
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to fetch booking history.' });
+    }
+});
+
+// GET bookings for the logged-in stylist
+router.get('/stylist', authenticate, async (req, res) => {
+    try {
+        const bookings = await Booking.find({ stylist: req.user.id })
+            .populate('userId', 'username email')
+            .sort({ dateTime: 1 });
+        res.json(bookings);
+    } catch (err) {
+        res.status(500).json({ message: 'Server error fetching stylist bookings.' });
+    }
+});
+
+// PUT approve a booking
+router.put('/:id/approve', authenticate, async (req, res) => {
+    try {
+        const booking = await Booking.findById(req.params.id);
+        if (!booking) return res.status(404).json({ message: 'Booking not found.' });
+        if (booking.stylist !== req.user.id) {
+            return res.status(403).json({ message: 'You can only approve your own bookings.' });
+        }
+        if (booking.status !== 'Pending') {
+            return res.status(400).json({ message: 'Only pending bookings can be approved.' });
+        }
+
+        booking.status = 'Confirmed';
+        await booking.save();
+        res.json({ message: 'Booking approved successfully!', booking });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error approving booking.' });
+    }
 });
 
 module.exports = router;

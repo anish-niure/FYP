@@ -1,19 +1,90 @@
-/* Footer.css */
 .footer {
-    background-color: #333;
-    color: white;
+    background-color: #212121; /* Dark gray background for contrast */
+    color: #f8f8f8; /* Slightly off-white text */
+    padding: 40px 20px; /* Uniform padding */
+    font-family: Arial, sans-serif;
+    font-size: 0.9rem; /* Slightly smaller font */
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    gap: 30px; /* Add spacing between columns */
+}
+
+.footer-section {
+    flex: 1;
+    margin: 0 20px 20px 20px; /* Uniform margin */
+    max-width: 300px;
+}
+
+.footer-section h2 {
+    font-size: 1.4rem;
+    color: #f1c40f; /* Gold color */
+    margin-bottom: 15px;
+}
+
+.footer-section p {
+    font-size: 0.95rem;
+    color: #dcdcdc; /* Light gray text for readability */
+}
+
+.footer-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    margin: 8px 0;
+}
+
+.footer-section ul li a {
+    text-decoration: none;
+    color: #f1c40f; /* Gold link color */
+    font-weight: bold;
+}
+
+.footer-section ul li a:hover {
+    color: #e67e22; /* Darker gold on hover */
+}
+
+.footer-bottom {
     text-align: center;
     padding: 10px 0;
-    bottom: 0;
+    background-color: #333; /* Dark background for the footer bottom */
 }
 
-.footer a {
-    color: #FFD700;
+.footer-bottom p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #dcdcdc; /* Light gray text */
+}
+
+.footer-bottom a {
+    color: #f1c40f; /* Gold color */
     text-decoration: none;
-    transition: color 0.3s ease;
 }
 
-.footer a:hover {
-    color: #dcbc07;
-    transform: scale(2);
+.footer-bottom a:hover {
+    color: #e67e22; /* Darker gold on hover */
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px; /* Added margin for spacing */
+}
+
+.social-links a {
+    text-decoration: none;
+    color: #f8f8f8; /* Slightly off-white for social icons */
+    margin: 0 12px;
+    font-size: 1.4rem;
+    text-transform: lowercase; /* Change social handles to lowercase */
+}
+
+.social-links a:hover {
+    color: #f1c40f; /* Gold color on hover */
 }
