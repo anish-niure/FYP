@@ -56,7 +56,6 @@ router.post('/create', verifyAdmin, async (req, res) => {
     });
     await newUser.save();
     console.log('New user created in User collection:', newUser._id);
-
     // Create new stylist with reference to the user
     const newStylist = new Stylist({
       username,
