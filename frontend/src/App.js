@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider }  from './context/AuthContext';
 import Home from './pages/User/Home';
+import PrivacyPolicy from './pages/User/PrivacyPolicy';
 import Services from './pages/User/Services';
 import Navbar from './components/Navbar';
 import About from './pages/User/About';
@@ -29,6 +30,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home openModal={() => setModalOpen(true)} />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/user/about" element={<About />} />
           <Route path="/user/clients" element={<Clients />} />
           <Route path="/user/contact" element={<Contact />} />

@@ -42,6 +42,8 @@ const Navbar = ({ openModal }) => {
             <li><Link to="/user/contact">Contact Info</Link></li>
             <li><Link to="/booking">Book Appointment</Link></li>
             <li><Link to="/store">Store</Link></li>
+
+            {/* Admin and Stylist Dashboard Links */}
             {user && user.role === 'stylist' && (
               <li><Link to="/stylist-dashboard">Stylist Dashboard</Link></li>
             )}
@@ -52,6 +54,7 @@ const Navbar = ({ openModal }) => {
         </div>
       </div>
 
+      {/* Rest of the code remains the same */}
       <div className="nav-center">
         <img
           src={moonLogo}
