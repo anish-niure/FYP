@@ -1,102 +1,223 @@
+/* Base container */
 .services-container {
-  padding: 20px;
+  padding: 30px;
   max-width: 1200px;
   margin: 0 auto;
-  background-color: #1C2526; /* Black background */
-  color: #FFFFFF; /* White text */
-  min-height: 100vh; /* Full height */
-  width: 100%; /* Ensure full width */
+  background-color: #0A0A0A; /* Deeper black for better contrast */
+  color: #F5F5F5; /* Off-white text for better readability */
+  min-height: 100vh;
+  width: 100%;
   box-sizing: border-box;
+  font-family: 'Montserrat', sans-serif; /* Modern, clean font */
 }
 
-/* Heading */
+/* Main heading */
 .services-container h1 {
   text-align: center;
-  margin-bottom: 30px;
-  color: #FFC107; /* Yellow/Gold */
-  font-size: 2.5rem;
+  margin-bottom: 40px;
+  color: #D4AF37; /* Rich gold color */
+  font-size: 2.8rem;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
+  font-weight: 700;
+  position: relative;
+  padding-bottom: 15px;
+}
+
+.services-container h1::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 3px;
+  background-color: #D4AF37; /* Gold underline */
 }
 
 /* Error and loading messages */
 .error-message {
-  color: #DC3545; /* Red for errors */
+  color: #FF4D4D; /* Brighter red for better visibility */
   text-align: center;
-  margin-bottom: 20px;
+  margin: 30px 0;
   font-size: 1.1rem;
+  font-weight: 500;
+  padding: 15px;
+  background-color: rgba(255, 77, 77, 0.1);
+  border-radius: 5px;
 }
 
 .loading-message {
   text-align: center;
   font-size: 1.2rem;
-  color: #FFFFFF; /* White text */
-  margin-bottom: 20px;
+  color: #F0F0F0; /* Off-white text */
+  margin: 40px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-message::after {
+  content: '...';
+  animation: loading-dots 1.5s infinite;
+}
+
+@keyframes loading-dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
 }
 
 /* Services list */
 .services-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 30px; /* Consistent spacing between cards */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 35px;
+  margin-top: 20px;
 }
 
 .services-list p {
   text-align: center;
   font-size: 1.2rem;
-  color: #FFFFFF; /* White text */
-  grid-column: 1 / -1; /* Span across all columns */
+  color: #F0F0F0; /* Off-white text */
+  grid-column: 1 / -1;
+  margin: 30px 0;
+  line-height: 1.6;
 }
 
 /* Service card */
 .service-card {
-  border: 2px solid #FFC107; /* Yellow/Gold border */
-  padding: 15px;
-  border-radius: 8px;
+  border: 1px solid #D4AF37; /* Refined gold border */
+  padding: 25px;
+  border-radius: 10px;
   text-align: center;
-  background-color: #2A3435; /* Slightly lighter black for card */
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: #151515; /* Slightly lighter than main background */
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.service-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
 }
 
 .service-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3); /* Yellow/Gold shadow on hover */
+  transform: translateY(-8px);
+  box-shadow: 0 10px 25px rgba(212, 175, 55, 0.2);
+  border-color: #D4AF37;
+}
+
+.service-card:hover::before {
+  transform: translateX(0);
 }
 
 .service-image {
   max-width: 100%;
-  height: auto;
-  border-radius: 5px;
-  border: 1px solid #FFC107; /* Yellow/Gold border for image */
-  margin-bottom: 10px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #D4AF37;
+  margin-bottom: 20px;
+  transition: transform 0.5s ease;
+}
+
+.service-card:hover .service-image {
+  transform: scale(1.05);
 }
 
 .service-card h3 {
-  margin: 10px 0;
-  font-size: 1.2rem;
-  color: #FFFFFF; /* White text */
+  margin: 15px 0;
+  font-size: 1.4rem;
+  color: #D4AF37; /* Gold headings */
+  font-weight: 600;
+  letter-spacing: 1px;
 }
 
 .service-card p {
-  margin: 5px 0;
-  color: #FFFFFF; /* White text */
-  font-size: 0.95rem;
+  margin: 12px 0;
+  color: #F0F0F0; /* Off-white text */
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.price {
+  font-weight: 600;
+  color: #D4AF37; /* Gold price */
+  font-size: 1.2rem;
+  margin: 15px 0;
 }
 
 .book-now-btn {
   display: inline-block;
-  padding: 8px 15px;
-  background-color: #FFC107; /* Yellow/Gold */
-  color: #000000; /* Black text */
+  padding: 10px 20px;
+  background-color: #D4AF37; /* Gold button */
+  color: #0A0A0A; /* Black text */
   border: none;
   border-radius: 5px;
   text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: bold;
+  font-size: 0.95rem;
+  font-weight: 700;
   text-transform: uppercase;
-  transition: background-color 0.3s ease;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  margin-top: 15px;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.book-now-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.7s ease;
+  z-index: -1;
 }
 
 .book-now-btn:hover {
-  background-color: #E0A800; /* Darker Yellow/Gold on hover */
+  background-color: #BF9B30; /* Darker gold */
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+}
+
+.book-now-btn:hover::before {
+  left: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .services-container {
+    padding: 20px;
+  }
+  
+  .services-container h1 {
+    font-size: 2.2rem;
+  }
+  
+  .services-list {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+  }
+}
+
+@media (max-width: 480px) {
+  .services-container h1 {
+    font-size: 1.8rem;
+  }
+  
+  .service-card {
+    padding: 20px;
+  }
 }

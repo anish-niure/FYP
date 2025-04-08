@@ -1,152 +1,284 @@
+/* Enhanced Navbar with Black and Gold Theme */
+
 /* Overall Navbar Layout */
 .navbar {
-    position: fixed;               /* Stays at the top while scrolling */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 60px;                  /* Fixed height for the navbar */
+    height: 70px; /* Slightly taller for better visibility */
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: rgba(135, 135, 135, 0.5); /* Slightly transparent dark gray */
-    padding: 0 0rem;
-    font-family: sans-serif;
-    z-index: 9999;  
-                   /* Ensures the navbar is above other elements */
-}
-
-/* If your main content disappears behind the navbar,
-   add margin-top in your global or body CSS:
-   
-*
-
-/* Left side: includes the dropdown container */
-.body {
-    margin-top: 100px;
+    background-color: rgba(10, 10, 10, 0.9); /* Near-black with transparency */
+    backdrop-filter: blur(10px); /* Modern blur effect for transparency */
+    -webkit-backdrop-filter: blur(10px); /* For Safari support */
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+    z-index: 9999;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3); /* Subtle gold border */
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.5); /* Stronger shadow for emphasis */
+    transition: all 0.3s ease;
   }
-.nav-left {
+  
+  /* Shrink navbar slightly when scrolling */
+  .navbar.scrolled {
+    height: 60px;
+    background-color: rgba(5, 5, 5, 0.95);
+  }
+  
+  /* Ensure body content doesn't hide behind navbar */
+  body {
+    margin-top: 70px;
+    padding-top: 30px;
+  }
+  
+  /* Left side: includes the dropdown container */
+  .nav-left {
     display: flex;
     align-items: center;
-    margin-left: 2rem;
-}
-
-/* Dropdown container for the menu icon */
-.dropdown-container {
+    margin-left: 2.5rem;
+  }
+  
+  /* Dropdown container for the menu icon */
+  .dropdown-container {
     position: relative;
     display: inline-block;
-}
-
-/* The menu icon */
-.menu-icon {
+  }
+  
+  /* The menu icon */
+  .menu-icon {
     width: 28px;
     height: 28px;
     cursor: pointer;
-}
-
-/* Dropdown menu initially hidden */
-.dropdown-menu {
+    filter: invert(79%) sepia(54%) saturate(757%) hue-rotate(359deg) brightness(89%) contrast(94%); /* Gold color filter */
+    transition: transform 0.3s ease;
+  }
+  
+  .menu-icon:hover {
+    transform: scale(1.1);
+  }
+  
+  /* Dropdown menu with improved styling */
+  .dropdown-menu {
     position: absolute;
-    top: calc(100% + 0.5rem);
+    top: calc(100% + 0.75rem);
     left: 0;
-    background-color: rgba(34, 34, 34, 0.95); /* Slightly transparent dark bg */
+    background-color: rgba(15, 15, 15, 0.95);
     list-style: none;
     margin: 0;
-    padding: 0.5rem 0;
-    min-width: 140px;
-    border-radius: 0.3rem;                /* Rounded corners */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Subtle shadow */
-    
-    /* Fade and slide in effect */
+    padding: 0.75rem 0;
+    min-width: 180px;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(212, 175, 55, 0.2);
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-10px);
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-}
-
-/* Reveal dropdown on hover with fade-in/slide-in */
-.dropdown-container:hover .dropdown-menu {
+    transform: translateY(-15px);
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    overflow: hidden;
+  }
+  
+  /* Reveal dropdown on hover with enhanced animation */
+  .dropdown-container:hover .dropdown-menu {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
-}
-
-/* Dropdown items */
-.dropdown-menu li {
-    padding: 0.5rem 1rem;
-}
-
-.dropdown-menu li a {
-    color: #fff;
+  }
+  
+  /* Dropdown items with improved styling */
+  .dropdown-menu li {
+    padding: 0;
+    transition: background-color 0.2s ease;
+  }
+  
+  .dropdown-menu li a {
+    color: #F5F5F5; /* Off-white text */
     text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-/* Gold text on hover */
-.dropdown-menu li a:hover {
-    color: #FFD700;
-}
-
-/* Center Section: truly center the text */
-.nav-center {
+    padding: 0.75rem 1.5rem;
+    display: block;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  
+  /* Gold accent and background on hover */
+  .dropdown-menu li:hover {
+    background-color: rgba(212, 175, 55, 0.1);
+  }
+  
+  .dropdown-menu li a:hover {
+    color: #D4AF37; /* Rich gold on hover */
+    padding-left: 1.8rem; /* Slight indent on hover */
+  }
+  
+  /* Gold indicator for active menu item */
+  .dropdown-menu li a.active {
+    color: #D4AF37;
+    background-color: rgba(212, 175, 55, 0.1);
+  }
+  
+  .dropdown-menu li a.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background-color: #D4AF37;
+  }
+  
+  /* Center Section with logo */
+  .nav-center {
     display: flex;
     justify-content: center;
     align-items: center;
     flex: 1;
-    height: 100%; /* Ensures it takes full height of the navbar */
-}
-
-/* Logo styling */
-.nav-logo {
-    height: 200px;  /* Adjusted size for optimal fit */
+    height: 100%;
+  }
+  
+  /* Logo styling */
+  .nav-logo {
+    height: 160px; /* Adjust based on your logo */
     width: auto;
-    max-width: 200px; /* Prevents excessive width */
-}
-
-/* Right side: store/profile icons */
-.nav-right {
+    max-width: 200px;
+    transition: all 0.3s ease;
+  }
+  
+  /* Shrink logo when navbar is scrolled */
+  .navbar.scrolled .nav-logo {
+    height: 140px;
+  }
+  
+  /* Right side: store/profile icons */
+  .nav-right {
     display: flex;
     align-items: center;
-    gap: 1.5rem; /* Enough space so icons aren't jammed */
-    margin-right: 2rem;
-}
-
-/* Icon links */
-.icon-link {
+    gap: 2rem; /* More spacing for legibility */
+    margin-right: 2.5rem;
+  }
+  
+  /* Icon links with improved hover effects */
+  .icon-link {
     text-decoration: none;
-}
-
-/* Icons: if your icons are white by default,
-   this filter turns them gold; remove if not needed. */
-.nav-icon {
+    position: relative;
+  }
+  
+  /* Icons with gold filter */
+  .nav-icon {
     width: 24px;
     height: 24px;
-    filter:   saturate(459%)
-             brightness(101%) contrast(100%);
-    transition: transform 0.2s ease;
-}
-
-.nav-icon:hover {
-    transform: scale(1.5);
-}
-.logout-button {
-    background-color: #1a1a1a;
-    color: #ffd700;
-    border: 2px solid #ffd700;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 1rem;
+    filter: invert(79%) sepia(54%) saturate(757%) hue-rotate(359deg) brightness(89%) contrast(94%); /* Gold color */
+    transition: all 0.3s ease;
+  }
+  
+  /* Scaled hover effect with glow */
+  .nav-icon:hover {
+    transform: scale(1.2);
+    filter: invert(79%) sepia(54%) saturate(757%) hue-rotate(359deg) brightness(105%) contrast(104%);
+  }
+  
+  /* Tooltip for icons */
+  .icon-link::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background-color: rgba(15, 15, 15, 0.95);
+    color: #F5F5F5;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(212, 175, 55, 0.2);
+  }
+  
+  .icon-link:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+  
+  /* Enhanced logout button */
+  .logout-button {
+    background-color: transparent;
+    color: #D4AF37; /* Rich gold */
+    border: 1.5px solid #D4AF37;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
-}
-.logout-button:hover {
-    background-color: #ffd700;
-    color: #121212;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  
+  .logout-button:hover {
+    background-color: #D4AF37;
+    color: #0A0A0A; /* Black text */
     transform: translateY(-2px);
-}
-.hover-logout {
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+  }
+  
+  .logout-button:active {
+    transform: translateY(0);
+  }
+  
+  /* Hover logout positioning */
+  .hover-logout {
     position: absolute;
     top: 100%;
     right: 0;
-    margin-top: 5px;
+    margin-top: 8px;
     z-index: 1001;
-}
+  }
+  
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    .nav-left {
+      margin-left: 1.5rem;
+    }
+    
+    .nav-right {
+      margin-right: 1.5rem;
+      gap: 1.5rem;
+    }
+    
+    .nav-logo {
+      height: 140px;
+      max-width: 160px;
+    }
+    
+    .navbar.scrolled .nav-logo {
+      height: 120px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .nav-left {
+      margin-left: 1rem;
+    }
+    
+    .nav-right {
+      margin-right: 1rem;
+      gap: 1rem;
+    }
+    
+    .nav-logo {
+      height: 120px;
+      max-width: 120px;
+    }
+    
+    .logout-button {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+    
+    .navbar.scrolled .nav-logo {
+      height: 100px;
+    }
+  }

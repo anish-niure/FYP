@@ -1,0 +1,126 @@
+/* PrivacyPolicy.css */
+
+:root {
+    /* Base colors */
+    --color-black: #0A0A0A;
+    --color-gold: #D4AF37;
+    --color-offwhite: #F5F5F5;
+    
+    /* Secondary colors */
+    --color-black-light: #151515;
+    --color-black-darkest: #050505;
+    --color-gold-light: #F5CD50;
+    --color-gold-dark: #BF9B30;
+    --color-gray-light: #E0E0E0;
+    
+    /* Transparent colors */
+    --color-gold-transparent-30: rgba(212, 175, 55, 0.3);
+    --color-gold-transparent-25: rgba(212, 175, 55, 0.25);
+    --color-gold-transparent-15: rgba(212, 175, 55, 0.15);
+    --color-gold-transparent-10: rgba(212, 175, 55, 0.1);
+    --color-white-transparent-05: rgba(255, 255, 255, 0.05);
+    --color-black-transparent-90: rgba(10, 10, 10, 0.9);
+    
+    /* Gradient definitions */
+    --gradient-gold-line: linear-gradient(90deg, transparent, #D4AF37, transparent);
+    --gradient-overlay: linear-gradient(135deg, rgba(212, 175, 55, 0.06), transparent, rgba(0, 0, 0, 0.2));
+    
+    /* Shadows */
+    --shadow-gold: 0 5px 15px rgba(212, 175, 55, 0.3);
+    --shadow-dark: 0 4px 10px rgba(0, 0, 0, 0.5);
+  }
+  
+  /* General body styling */
+  body {
+    background-color: var(--color-black) !important;
+    color: var(--color-offwhite);
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Privacy policy page styling */
+  .privacy-policy-page {
+    padding: 20px;
+  }
+  
+  /* Header section */
+  .privacy-policy-header {
+    background-color: var(--color-black-light);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-dark);
+    text-align: center;
+  }
+  
+  .privacy-policy-header h1 {
+    font-size: 2.5em;
+    color: var(--color-gold);
+  }
+  
+  .privacy-policy-header p {
+    font-size: 1.2em;
+    color: var(--color-gray-light);
+  }
+  
+  /* Content section */
+  .privacy-policy-content {
+    margin-top: 30px;
+  }
+  
+  /* Sections */
+  .privacy-policy-section {
+    background-color: var(--color-black-light);
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: var(--shadow-gold);
+  }
+  
+  .privacy-policy-section h2 {
+    color: var(--color-gold);
+    font-size: 1.8em;
+    margin-bottom: 10px;
+  }
+  
+  .privacy-policy-section p {
+    font-size: 1.1em;
+    color: var(--color-offwhite);
+    line-height: 1.6;
+  }
+  
+  .privacy-policy-section ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .privacy-policy-section li {
+    font-size: 1.1em;
+    color: var(--color-gray-light);
+    margin-bottom: 8px;
+  }
+  
+  /* Links */
+  a {
+    color: var(--color-gold);
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  a:hover {
+    color: var(--color-gold-light);
+  }
+  
+  /* Footer */
+  footer {
+    background-color: var(--color-black-darkest);
+    color: var(--color-offwhite);
+    padding: 10px 0;
+    text-align: center;
+    margin-top: 30px;
+  }
+  
+  footer p {
+    font-size: 1em;
+    color: var(--color-gray-light);
+  }

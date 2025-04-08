@@ -1,90 +1,323 @@
-.footer {
-    background-color: #212121; /* Dark gray background for contrast */
-    color: #f8f8f8; /* Slightly off-white text */
-    padding: 40px 20px; /* Uniform padding */
-    font-family: Arial, sans-serif;
-    font-size: 0.9rem; /* Slightly smaller font */
-}
-
-.footer-container {
+/* Ensure the footer stays at the bottom */
+body, html {
+    height: 100%;
+    margin: 0;
     display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-    gap: 30px; /* Add spacing between columns */
-}
-
-.footer-section {
-    flex: 1;
-    margin: 0 20px 20px 20px; /* Uniform margin */
-    max-width: 300px;
-}
-
-.footer-section h2 {
-    font-size: 1.4rem;
-    color: #f1c40f; /* Gold color */
-    margin-bottom: 15px;
-}
-
-.footer-section p {
+    flex-direction: column;
+  }
+  
+  /* Footer styles */
+  .footer {
+    background-color: #0A0A0A; /* Deep black background */
+    color: #F5F5F5; /* Off-white text */
+    padding: 70px 30px 40px;
+    font-family: 'Montserrat', 'Arial', sans-serif;
     font-size: 0.95rem;
-    color: #dcdcdc; /* Light gray text for readability */
-}
-
-.footer-section ul {
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3); /* Shadow above the footer */
+    flex-shrink: 0; /* Prevent the footer from shrinking */
+  }
+  
+  /* Gold accent at the top of footer */
+  .footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+    opacity: 0.8;
+  }
+  
+  /* Subtle diagonal gradient overlay */
+  .footer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.06), transparent, rgba(0, 0, 0, 0.2));
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  /* Footer container layout */
+  .footer-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Flexible grid layout */
+    gap: 50px;
+    max-width: 1200px;
+    margin: 0 auto 50px;
+    position: relative;
+    z-index: 2; /* Position above the gradient overlay */
+  }
+  
+  /* Footer section styles */
+  .footer-section {
+    margin: 0;
+    min-width: 0;
+  }
+  
+  .footer-section h2 {
+    font-size: 1.5rem;
+    color: #D4AF37; /* Rich gold heading */
+    margin-bottom: 25px;
+    position: relative;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: color 0.3s ease; /* Smooth color transition */
+  }
+  
+  /* Elegant underline effect */
+  .footer-section h2::after {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 2px;
+    background: #D4AF37; /* Gold underline */
+    bottom: -10px;
+    left: 0;
+    transition: width 0.3s ease, background-color 0.3s ease;
+  }
+  
+  .footer-section:hover h2::after {
+    width: 80px;
+    background-color: #F5CD50; /* Brighter gold on hover */
+  }
+  
+  .footer-section p {
+    font-size: 0.95rem;
+    color: #E0E0E0; /* Light gray text */
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+  
+  .footer-section ul {
     list-style-type: none;
     padding: 0;
-}
-
-.footer-section ul li {
-    margin: 8px 0;
-}
-
-.footer-section ul li a {
-    text-decoration: none;
-    color: #f1c40f; /* Gold link color */
-    font-weight: bold;
-}
-
-.footer-section ul li a:hover {
-    color: #e67e22; /* Darker gold on hover */
-}
-
-.footer-bottom {
-    text-align: center;
-    padding: 10px 0;
-    background-color: #333; /* Dark background for the footer bottom */
-}
-
-.footer-bottom p {
     margin: 0;
-    font-size: 0.9rem;
-    color: #dcdcdc; /* Light gray text */
-}
-
-.footer-bottom a {
-    color: #f1c40f; /* Gold color */
+  }
+  
+  .footer-section ul li {
+    margin: 14px 0;
+    transition: all 0.25s ease;
+    position: relative;
+    padding-left: 5px;
+  }
+  
+  /* Gold arrow indicator on hover */
+  .footer-section ul li::before {
+    content: '→';
+    position: absolute;
+    left: -18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #D4AF37;
+    opacity: 0;
+    transition: all 0.25s ease;
+  }
+  
+  .footer-section ul li:hover {
+    transform: translateX(18px); /* Shift on hover */
+    padding-left: 0;
+  }
+  
+  .footer-section ul li:hover::before {
+    opacity: 1;
+    left: -15px; /* Gold arrow appears on hover */
+  }
+  
+  .footer-section ul li a {
     text-decoration: none;
-}
-
-.footer-bottom a:hover {
-    color: #e67e22; /* Darker gold on hover */
-}
-
-.social-links {
+    color: #E0E0E0; /* Light gray links */
+    font-weight: 400;
+    transition: color 0.25s ease;
+  }
+  
+  .footer-section ul li a:hover {
+    color: #D4AF37; /* Gold on hover */
+  }
+  
+  /* Newsletter form styling */
+  .newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+  }
+  
+  .newsletter-input {
+    padding: 12px 15px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    color: #F5F5F5;
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+  }
+  
+  .newsletter-input:focus {
+    outline: none;
+    border-color: #D4AF37;
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.15);
+  }
+  
+  .newsletter-button {
+    padding: 12px 20px;
+    background-color: #D4AF37;
+    color: #0A0A0A;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+  }
+  
+  .newsletter-button:hover {
+    background-color: #F5CD50;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.25);
+  }
+  
+  /* Footer bottom section */
+  .footer-bottom {
+    text-align: center;
+    padding: 25px 0;
+    background-color: #050505; /* Darker black for contrast */
+    border-top: 1px solid rgba(212, 175, 55, 0.15); /* Subtle gold border */
+    position: relative;
+    z-index: 2;
+  }
+  
+  .footer-bottom p {
+    margin: 0 0 10px 0;
+    font-size: 0.9rem;
+    color: #BBBBBB;
+  }
+  
+  .footer-bottom a {
+    color: #D4AF37;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .footer-bottom a:hover {
+    color: #F5CD50;
+    text-decoration: underline;
+  }
+  
+  /* Social links with enhanced styling */
+  .social-links {
     display: flex;
     justify-content: center;
-    margin-top: 10px; /* Added margin for spacing */
-}
-
-.social-links a {
+    gap: 25px;
+    margin-top: 20px;
+  }
+  
+  .social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(212, 175, 55, 0.1);
+    color: #F5F5F5; /* White icons */
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
     text-decoration: none;
-    color: #f8f8f8; /* Slightly off-white for social icons */
-    margin: 0 12px;
-    font-size: 1.4rem;
-    text-transform: lowercase; /* Change social handles to lowercase */
+  }
+  
+  /* Change color on hover */
+  .social-icon:hover {
+    background-color: #D4AF37;
+    color: #0A0A0A;
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+  }
+  .social-links a {
+    text-decoration: none;
+    color: #f8f8f8;
+    font-size: 1.6rem; /* Larger icons for prominence */
+    text-transform: lowercase;
+    transition: all 0.3s ease; /* Smooth transition for multiple properties */
 }
-
 .social-links a:hover {
-    color: #f1c40f; /* Gold color on hover */
+    color: #f1c40f;
+    transform: scale(1.2); /* Subtle zoom effect */
 }
+  
+  /* Quick contact info */
+  .contact-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    color: #E0E0E0;
+  }
+  
+  .contact-icon {
+    color: #D4AF37;
+    margin-right: 12px;
+    font-size: 1.1rem;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 992px) {
+    .footer-container {
+      gap: 40px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .footer {
+      padding: 50px 20px 30px;
+    }
+  
+    .footer-section h2 {
+      font-size: 1.3rem;
+    }
+  
+    .social-icon {
+      width: 35px;
+      height: 35px;
+      font-size: 1.1rem;
+    }
+  
+    .footer-container {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 30px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .footer {
+      padding: 40px 15px 25px;
+    }
+  
+    .footer-section h2 {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+    }
+  
+    .footer-section ul li {
+      margin: 10px 0;
+    }
+  
+    .newsletter-form {
+      flex-direction: column;
+    }
+  
+    .footer-container {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+  }
