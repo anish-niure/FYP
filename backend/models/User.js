@@ -25,6 +25,7 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  isBlocked: { type: Boolean, default: false },
   resetPasswordToken: { type: String }, // Add this
   resetPasswordExpires: { type: Date }, // Add this
 });

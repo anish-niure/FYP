@@ -13,10 +13,12 @@ import Booking from './pages/User/Booking';
 import Store from './pages/User/Store';
 import Notification from './pages/User/Notification';
 import StylistDashboard from './pages/Stylist/StylistDashboard';
+import AdminUserManagement from './pages/Admin/AdminUserManagement';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import AdminStylists from './pages/Admin/AdminStylists';
 import AdminService from './pages/Admin/AdminService';
 import AdminStore from './pages/Admin/AdminStore';
+
 import Modal from './components/Modal';
 import ForgotPassword from './components/ForgotPassword';
 
@@ -45,6 +47,7 @@ function App() {
           <Route path="/admin/stylists" element={<AdminStylists />} />
           <Route path="/admin/services" element={<AdminService />} />
           <Route path="/admin/store" element={<AdminStore />} />
+          <Route path="/admin/user-management" element={<AdminUserManagement />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
         <Modal isOpen={modalOpen} closeModal={() => setModalOpen(false)} />
