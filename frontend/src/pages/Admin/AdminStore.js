@@ -9,6 +9,7 @@ const AdminStore = () => {
         name: '',
         description: '',
         price: '',
+        image: null,
     });
     const [editProduct, setEditProduct] = useState(null);
     const [error, setError] = useState('');
@@ -59,6 +60,15 @@ const AdminStore = () => {
         }
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (editProduct) {
+            setEditProduct((prev) => ({ ...prev, image: file }));
+        } else {
+            setNewProduct((prev) => ({ ...prev, image: file }));
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -69,26 +79,29 @@ const AdminStore = () => {
                 return;
             }
 
+            const formData = new FormData();
+            formData.append('name', editProduct ? editProduct.name : newProduct.name);
+            formData.append('description', editProduct ? editProduct.description : newProduct.description);
+            formData.append('price', editProduct ? editProduct.price : newProduct.price);
+            if (editProduct?.image || newProduct.image) {
+                formData.append('image', editProduct?.image || newProduct.image);
+            }
+
             if (editProduct) {
-                console.log('Sending PUT request to /api/products');
-                const res = await axios.put(`/api/products/${editProduct._id}`, editProduct, {
+                await axios.put(`/api/products/${editProduct._id}`, formData, {
                     headers: {
                         Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'multipart/form-data',
                     },
                 });
-                console.log('PUT response:', res.data);
                 setEditProduct(null);
             } else {
-                console.log('Sending POST request to /api/products');
-                const res = await axios.post('/api/products', newProduct, {
+                await axios.post('/api/products', formData, {
                     headers: {
                         Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'multipart/form-data',
                     },
                 });
-                console.log('POST response:', res.data);
-                setNewProduct({ name: '', description: '', price: '' });
             }
 
             fetchProducts();
@@ -96,10 +109,6 @@ const AdminStore = () => {
             alert(editProduct ? 'Product updated successfully!' : 'Product added successfully!');
         } catch (error) {
             console.error('Error adding/updating product:', error);
-            if (error.response) {
-                console.error('Response data:', error.response.data);
-                console.error('Response status:', error.response.status);
-            }
             setError(error.response?.data?.message || 'Failed to add/update product. Please try again.');
         }
     };
@@ -172,6 +181,11 @@ const AdminStore = () => {
                     min="0"
                     step="0.01"
                 />
+                <input
+                    type="file"
+                    name="image"
+                    onChange={handleFileChange}
+                />
                 <button type="submit">{editProduct ? 'Update Product' : 'Add Product'}</button>
                 {editProduct && (
                     <button type="button" onClick={() => setEditProduct(null)}>Cancel</button>
@@ -179,9 +193,13 @@ const AdminStore = () => {
             </form>
 
             <div className="products-list">
-                {products.map(product => (
+                {products.map((product) => (
                     <div key={product._id} className="product-card">
-                        <img src={product.imageUrl} alt={product.name} />
+                        <img
+                            src={product.imageUrl ? `http://localhost:5001${product.imageUrl}` : 'https://via.placeholder.com/150'}
+                            alt={product.name}
+                            className="product-image"
+                        />
                         <h3>{product.name}</h3>
                         <p>{product.description}</p>
                         <p>Price: ${product.price.toFixed(2)}</p>

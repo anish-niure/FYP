@@ -130,9 +130,11 @@
 }
 
 .product-card img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 5px;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 15px;
     border: 1px solid #FFD700; /* Yellow/Gold border for image */
 }
 
