@@ -1,45 +1,54 @@
-import React, { useState } from 'react';
-import Header from '../../components/Header'; // Adjust path if different
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import Header from '../../components/Header';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import Modal from '../../components/Modal';
 import '../../styles/Home.css';
 
-const Home = ({ openModal }) => { // Receive openModal from App.js
+const Home = ({ openModal }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [services, setServices] = useState([]);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        // Fetch services from the database
+        const fetchServices = async () => {
+            try {
+                const response = await axios.get('http://localhost:5001/api/services');
+                setServices(response.data);
+            } catch (err) {
+                setError('Failed to load services. Please try again later.');
+            }
+        };
+
+        fetchServices();
+    }, []);
 
     return (
         <div className="home">
-            <Navbar openModal={openModal} /> {/* Already passing openModal */}
-            <Header openModal={openModal} /> {/* Pass openModal to Header */}
+            <Navbar openModal={openModal} />
+            <Header openModal={openModal} />
             <div className="content">
                 <section className="services">
                     <h2>Our Services</h2>
+                    {error && <p className="error">{error}</p>}
                     <div className="services-grid">
-                        <div className="service">
-                            <img
-                                src="https://images.unsplash.com/photo-1559599101-f09722fb4948?q=80&w=2669&auto=format&fit=crop"
-                                alt="Haircut & Styling"
-                            />
-                            <h3>Haircut & Styling</h3>
-                            <p>Experience the latest trends in haircuts and styles.</p>
-                        </div>
-                        <div className="service">
-                            <img
-                                src="https://images.unsplash.com/photo-1542848284-8afa78a08ccb?q=80&w=2572&auto=format&fit=crop"
-                                alt="Massage Therapy"
-                            />
-                            <h3>Massage Therapy</h3>
-                            <p>Relax and unwind with our soothing massage services.</p>
-                        </div>
-                        <div className="service">
-                            <img
-                                src="https://img.freepik.com/premium-photo/manicure-pedicure_199352-47.jpg?w=1800"
-                                alt="Manicure & Pedicure"
-                            />
-                            <h3>Manicure & Pedicure</h3>
-                            <p>Keep your nails healthy and beautiful.</p>
-                        </div>
+                        {services.length > 0 ? (
+                            services.map((service) => (
+                                <div key={service._id} className="service">
+                                    <img
+                                        src={service.imageUrl || 'https://via.placeholder.com/300'}
+                                        alt={service.name}
+                                    />
+                                    <h3>{service.name}</h3>
+                                    <p>{service.description}</p>
+                                    <p>{service.priceRange}</p>
+                                </div>
+                            ))
+                        ) : (
+                            <p>No services available at the moment.</p>
+                        )}
                     </div>
                 </section>
             </div>
