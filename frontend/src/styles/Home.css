@@ -121,3 +121,19 @@
     font-size: 1rem;
     margin-bottom: 10px;
 }
+
+/* Book Now button styling */
+.book-now-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #FFD700; /* Gold */
+    color: #000; /* Black text */
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.book-now-btn:hover {
+    background-color: #FFC300; /* Darker gold */
+}
