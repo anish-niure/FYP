@@ -4,12 +4,25 @@ const User = require('../models/User');
 const Stylist = require('../models/Stylist');
 const bcrypt = require('bcryptjs');
 const { verifyAdmin } = require('../middleware/authMiddleware');
+const multer = require('multer');
+const path = require('path');
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Directory to store uploaded files
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+const upload = multer({ storage });
 
 // Get all stylists (admin only)
 router.get('/', verifyAdmin, async (req, res) => {
   try {
     const stylists = await Stylist.find();
-    res.json(stylists);
+    res.json(stylists); // Ensure imageUrl is included in the response
   } catch (error) {
     console.error('Error fetching stylists:', error);
     res.status(500).json({ message: 'Server error while fetching stylists', error: error.message });
@@ -17,37 +30,37 @@ router.get('/', verifyAdmin, async (req, res) => {
 });
 
 // Create a new stylist (admin only)
-router.post('/create', verifyAdmin, async (req, res) => {
+router.post('/create', verifyAdmin, upload.single('image'), async (req, res) => {
   const { username, email, password } = req.body;
+
+  // Validate required fields
+  if (!username || !email || !password) {
+    return res.status(400).json({ message: 'All fields (username, email, password) are required.' });
+  }
+
   try {
     console.log('Creating stylist with:', { username, email });
 
-    // Check if user already exists in User collection
+    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      console.log('User already exists in User collection:', email);
       return res.status(400).json({ message: 'User with this email already exists' });
     }
 
-    // Check if stylist already exists in Stylist collection
     const existingStylist = await Stylist.findOne({ email });
     if (existingStylist) {
-      console.log('Stylist already exists in Stylist collection:', email);
       return res.status(400).json({ message: 'Stylist with this email already exists' });
     }
 
-    // Check if username is taken
     const existingUsername = await Stylist.findOne({ username });
     if (existingUsername) {
-      console.log('Username already taken:', username);
       return res.status(400).json({ message: 'Username is already taken' });
     }
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log('Password hashed successfully');
 
-    // Create new user with role 'stylist'
+    // Create new user
     const newUser = new User({
       username,
       email,
@@ -55,15 +68,16 @@ router.post('/create', verifyAdmin, async (req, res) => {
       role: 'stylist',
     });
     await newUser.save();
-    console.log('New user created in User collection:', newUser._id);
-    // Create new stylist with reference to the user
+
+    // Create new stylist
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
     const newStylist = new Stylist({
       username,
       email,
       userId: newUser._id,
+      imageUrl,
     });
     await newStylist.save();
-    console.log('New stylist created in Stylist collection:', newStylist._id);
 
     res.status(201).json({ message: 'Stylist created successfully' });
   } catch (error) {

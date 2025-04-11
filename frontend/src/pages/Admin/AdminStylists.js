@@ -5,7 +5,7 @@ import '../../styles/AdminStylists.css';
 
 const AdminStylists = () => {
   const [stylists, setStylists] = useState([]);
-  const [formData, setFormData] = useState({ username: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ username: '', email: '', password: '', image: null });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -42,29 +42,50 @@ const AdminStylists = () => {
     fetchStylists();
   }, [token, navigate, fetchStylists]);
 
+  const handleFileChange = (e) => {
+    setFormData({ ...formData, image: e.target.files[0] });
+  };
+
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission
-    e.stopPropagation(); // Stop event bubbling
+    e.preventDefault();
+
+    // Validate form data
+    if (!formData.username || !formData.email || !formData.password) {
+      setError('All fields (username, email, password) are required.');
+      return;
+    }
+
     try {
       setLoading(true);
-      setError(''); // Clear previous errors
-      setSuccess(''); // Clear previous success message
+      setError('');
+      setSuccess('');
+
+      const formDataToSend = new FormData();
+      formDataToSend.append('username', formData.username);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('password', formData.password);
+      if (formData.image) {
+        formDataToSend.append('image', formData.image);
+      }
+
       const response = await axios.post(
         'http://localhost:5001/api/stylists/create',
-        formData,
-        { headers: { Authorization: `Bearer ${token}` } }
+        formDataToSend,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
       );
+
       setSuccess(response.data.message || 'Stylist created successfully!');
-      setFormData({ username: '', email: '', password: '' }); // Reset form
+      setFormData({ username: '', email: '', password: '', image: null });
       fetchStylists();
     } catch (err) {
       console.error('Error creating stylist:', err);
       const errorMessage = err.response?.data?.message || 'Failed to create stylist. Please try again.';
       setError(errorMessage);
-      if (err.response?.status === 401 || err.response?.status === 403) {
-        localStorage.removeItem('token'); // Clear invalid token
-        navigate('/'); // Redirect to login if unauthorized
-      }
     } finally {
       setLoading(false);
     }
@@ -181,6 +202,12 @@ const AdminStylists = () => {
           required
           disabled={loading}
         />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          disabled={loading}
+        />
         <button type="submit" disabled={loading}>
           {loading ? 'Creating...' : 'Create Stylist'}
         </button>
@@ -193,6 +220,7 @@ const AdminStylists = () => {
         <table className="stylists-table">
           <thead>
             <tr>
+              <th>Image</th>
               <th>Username</th>
               <th>Email</th>
               <th>Actions</th>
@@ -201,6 +229,17 @@ const AdminStylists = () => {
           <tbody>
             {stylists.map((stylist) => (
               <tr key={stylist._id}>
+                <td>
+                  {stylist.imageUrl ? (
+                    <img
+                      src={`http://localhost:5001${stylist.imageUrl}`}
+                      alt={stylist.username}
+                      className="stylist-image"
+                    />
+                  ) : (
+                    'No Image'
+                  )}
+                </td>
                 <td>{stylist.username}</td>
                 <td>{stylist.email}</td>
                 <td>
