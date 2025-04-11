@@ -1,0 +1,164 @@
+.admin-stylists {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #1C2526; /* Black background */
+  color: #FFFFFF; /* White text */
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-stylists h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #FFC107; /* Yellow/Gold */
+  font-size: 2.5rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.admin-stylists h2 {
+  color: #FFC107; /* Yellow/Gold */
+  margin: 20px 0;
+  font-size: 1.5rem;
+}
+
+.error {
+  color: #DC3545; /* Red for errors */
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+}
+
+.success {
+  color: #28A745; /* Green for success */
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+}
+
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #FFFFFF;
+  margin-bottom: 20px;
+}
+
+.create-stylist-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 400px;
+  margin: 0 auto 40px;
+  padding: 20px;
+  background-color: #2A3435; /* Slightly lighter black */
+  border: 2px solid #FFC107; /* Yellow/Gold border */
+  border-radius: 8px;
+}
+
+.create-stylist-form input {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #FFC107;
+  border-radius: 5px;
+  background-color: #FFFFFF;
+  color: #000000;
+}
+
+.create-stylist-form input:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.create-stylist-form button {
+  padding: 10px;
+  background-color: #FFC107; /* Yellow/Gold */
+  color: #000000;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.create-stylist-form button:hover:not(:disabled) {
+  background-color: #E0A800; /* Darker Yellow/Gold */
+}
+
+.create-stylist-form button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.stylists-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #2A3435; /* Slightly lighter black */
+  border: 2px solid #FFC107; /* Yellow/Gold border */
+}
+
+.stylists-table th,
+.stylists-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #FFC107;
+  color: #FFFFFF;
+}
+
+.stylists-table th {
+  background-color: #FFC107; /* Yellow/Gold */
+  color: #000000;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.stylists-table td {
+  background-color: #2A3435;
+}
+
+.stylists-table button {
+  margin-right: 10px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.stylists-table button:first-child {
+  background-color: #FFC107; /* Yellow/Gold for Edit */
+  color: #000000;
+}
+
+.stylists-table button:first-child:hover:not(:disabled) {
+  background-color: #E0A800; /* Darker Yellow/Gold */
+}
+
+.stylists-table button:nth-child(2) {
+  background-color: #DC3545; /* Red for Delete */
+  color: #FFFFFF;
+}
+
+.stylists-table button:nth-child(2):hover:not(:disabled) {
+  background-color: #C82333; /* Darker Red */
+}
+
+.stylists-table button:nth-child(3) {
+  background-color: #28A745; /* Green for Reset Password */
+  color: #FFFFFF;
+}
+
+.stylists-table button:nth-child(3):hover:not(:disabled) {
+  background-color: #218838; /* Darker Green */
+}
+
+.stylists-table button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}

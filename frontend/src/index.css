@@ -1,0 +1,14 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  background-color: #1C2526; /* Black background */
+  color: #FFFFFF; /* Default white text */
+  font-family: Arial, sans-serif; /* Optional: set a default font */
+  height: 100%;
+  width: 100%;
+}
+
+#root {
+  min-height: 100vh; /* Ensure the root div covers the full height */
+  background-color: #1C2526; /* Black background */
+}

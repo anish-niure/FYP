@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salon Management System - Home</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+
+        /* Header Section */
+        header {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                              url('https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+            height: 70vh;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        }
+
+        header p {
+            font-size: 1.5rem;
+            margin-top: 10px;
+        }
+
+        .cta-buttons {
+            margin-top: 20px;
+        }
+
+        .cta-buttons a {
+            background-color: #ff6347;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .cta-buttons a:hover {
+            background-color: #e5533d;
+        }
+
+        /* Navigation Bar */
+        nav {
+            background-color: rgba(0, 0, 0, 0.8);
+            width: 100%;
+            padding: 10px 20px;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1.2rem;
+        }
+
+        nav a:hover {
+            color: #ff6347;
+        }
+
+        .nav-left, .nav-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .store-icon img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .login-section {
+            background-color: #f6d604;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .login-section:hover {
+            background-color: #e5c93d;
+        }
+
+        /* Content Section */
+        .content {
+            margin-top: 90px;
+            padding: 40px 20px;
+        }
+
+        .services {
+            padding: 40px 20px;
+            text-align: center;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Shadow around the content */
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .services h2 {
+            margin-bottom: 30px;
+            color: #8e44ad;
+        }
+
+        .services-grid {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .service {
+            background: white;
+            width: 280px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15); /* Card Shadow */
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .service:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .service img {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .service h3 {
+            margin: 15px 0;
+            color: #3498db;
+        }
+
+        .service p {
+            color: #7f8c8d;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 20px;
+        }
+
+        footer a {
+            color: #ff6347;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            width: 350px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.3s ease;
+        }
+
+        .modal-content input:focus {
+            border-color: #ff6347;
+        }
+
+        .modal-content button {
+            width: 100%;
+            padding: 12px;
+            background-color: #ff6347;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal-content button:hover {
+            background-color: #e5533d;
+        }
+
+        .modal-footer {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .modal-footer a {
+            color: #333;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .modal-footer a:hover {
+            color: #ff6347;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <h1>Welcome to The Moon’s Salon</h1>
+        <p>Your one-stop destination for beauty and wellness</p>
+        <div class="cta-buttons">
+            <a href="/appointment">Book an Appointment</a>
+            <a href="/services">Explore Services</a>
+        </div>
+    </header>
+
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="nav-left">
+            <a href="home.html">Home</a>
+            <a href="/services">Services</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+        </div>
+        <div class="nav-right">
+            <a href="/store" class="store-icon">
+                <img src="https://cdn-icons-png.flaticon.com/512/891/891462.png" alt="Store Icon">
+            </a>
+            <a href="#" id="openLoginNav" class="login-section">Login/Sign Up</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Services Section -->
+        <section class="services">
+            <h2>Our Services</h2>
+            <div class="services-grid">
+                <div class="service">
+                    <img src="https://images.unsplash.com/photo-1559599101-f09722fb4948?q=80&w=2669&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Haircut & Styling">
+                    <h3>Haircut & Styling</h3>
+                    <p>Experience the latest trends in haircuts and styles.</p>
+                </div>
+                <div class="service">
+                    <img src="https://images.unsplash.com/photo-1542848284-8afa78a08ccb?q=80&w=2572&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Massage Therapy">
+                    <h3>Massage Therapy</h3>
+                    <p>Relax and unwind with our soothing massage services.</p>
+                </div>
+                <div class="service">
+                    <img src="https://images.unsplash.com/photo-1618328769009-b1a3e561f5e8?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Manicure & Pedicure">
+                    <h3>Manicure & Pedicure</h3>
+                    <p>Keep your nails healthy and beautiful.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2024 The Moon’s Salon. All Rights Reserved.</p>
+        <p>Visit our <a href="/store">Store</a> for amazing products.</p>
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <h2>Login / Sign Up</h2>
+            <form id="loginForm">
+                <!-- Login Form -->
+                <div id="loginFormSection">
+                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="password" name="password" placeholder="Password" required>
+                    <button type="submit">Login</button>
+                </div>
+                <!-- Sign Up Form (Initially hidden) -->
+                <div id="signupFormSection" style="display:none;">
+                    <input type="text" name="username" placeholder="Username" required>
+                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="password" name="password" placeholder="Password" required>
+                    <button type="submit">Sign Up</button>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <a href="#" id="toggleForm">Don't have an account? Create one</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript to handle modal and form toggle -->
+    <script>
+        const openLoginNav = document.getElementById('openLoginNav');
+        const modal = document.getElementById('loginModal');
+        const toggleForm = document.getElementById('toggleForm');
+        const loginFormSection = document.getElementById('loginFormSection');
+        const signupFormSection = document.getElementById('signupFormSection');
+
+        // Open modal when Login/Sign Up is clicked
+        openLoginNav.addEventListener('click', () => {
+            modal.classList.add('active');
+            loginFormSection.style.display = 'block';
+            signupFormSection.style.display = 'none';
+            toggleForm.textContent = "Don't have an account? Create one";
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+
+        // Switch between login and sign up forms
+        toggleForm.addEventListener('click', () => {
+            if (loginFormSection.style.display === 'none') {
+                loginFormSection.style.display = 'block';
+                signupFormSection.style.display = 'none';
+                toggleForm.textContent = "Don't have an account? Create one";
+            } else {
+                loginFormSection.style.display = 'none';
+                signupFormSection.style.display = 'block';
+                toggleForm.textContent = "Already have an account? Login";
+            }
+        });
+    </script>
+</body>
+</html>

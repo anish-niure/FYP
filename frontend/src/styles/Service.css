@@ -1,0 +1,102 @@
+.services-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #1C2526; /* Black background */
+  color: #FFFFFF; /* White text */
+  min-height: 100vh; /* Full height */
+  width: 100%; /* Ensure full width */
+  box-sizing: border-box;
+}
+
+/* Heading */
+.services-container h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #FFC107; /* Yellow/Gold */
+  font-size: 2.5rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* Error and loading messages */
+.error-message {
+  color: #DC3545; /* Red for errors */
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+}
+
+.loading-message {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #FFFFFF; /* White text */
+  margin-bottom: 20px;
+}
+
+/* Services list */
+.services-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 30px; /* Consistent spacing between cards */
+}
+
+.services-list p {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #FFFFFF; /* White text */
+  grid-column: 1 / -1; /* Span across all columns */
+}
+
+/* Service card */
+.service-card {
+  border: 2px solid #FFC107; /* Yellow/Gold border */
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  background-color: #2A3435; /* Slightly lighter black for card */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3); /* Yellow/Gold shadow on hover */
+}
+
+.service-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+  border: 1px solid #FFC107; /* Yellow/Gold border for image */
+  margin-bottom: 10px;
+}
+
+.service-card h3 {
+  margin: 10px 0;
+  font-size: 1.2rem;
+  color: #FFFFFF; /* White text */
+}
+
+.service-card p {
+  margin: 5px 0;
+  color: #FFFFFF; /* White text */
+  font-size: 0.95rem;
+}
+
+.book-now-btn {
+  display: inline-block;
+  padding: 8px 15px;
+  background-color: #FFC107; /* Yellow/Gold */
+  color: #000000; /* Black text */
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
+}
+
+.book-now-btn:hover {
+  background-color: #E0A800; /* Darker Yellow/Gold on hover */
+}

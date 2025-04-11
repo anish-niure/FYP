@@ -1,0 +1,121 @@
+/* Modal overlay: covers the entire screen */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Dark overlay */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+  
+  /* Modal content container */
+  .modal-content {
+    background-color: #000; /* Black background */
+    border: 2px solid #FFD700; /* Gold border */
+    border-radius: 6px;
+    padding: 20px 30px;
+    width: 300px;
+    max-width: 90%;
+    color: #FFD700; /* Yellow (gold) text */
+    position: relative;
+    font-family: sans-serif;
+  }
+  
+  /* Simple heading style */
+  .modal-content h2 {
+    margin-bottom: 16px;
+    text-align: center;
+    color: #FFD700;
+  }
+  
+  /* Inputs */
+  .modal-content input {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: #222;  /* Dark input background */
+    border: 1px solid #FFD700;
+    color: #FFD700;         /* Gold input text */
+    border-radius: 4px;
+  }
+  
+  /* Forgot Password link */
+  .forgot-password {
+    text-align: right;
+    margin: 5px 0 10px;
+  }
+  
+  .forgot-password a {
+    font-size: 14px;
+    color: #FFD700; 
+    text-decoration: underline;
+  }
+  
+  /* Buttons */
+  .modal-content button {
+    background-color: #FFD700; /* Gold background */
+    color: #000;               /* Black text */
+    border: none;
+    padding: 12px;
+    width: 100%;
+    cursor: pointer;
+    margin-top: 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .modal-content button:hover {
+    background-color: #FFC107;
+  }
+  
+  .modal-content button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  /* Toggle section for switching forms */
+  .toggle-section {
+    text-align: center;
+    margin-top: 10px;
+  }
+  
+  .toggle-section .toggle-btn {
+    background: none;
+    color: #FFD700;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 14px;
+  }
+  
+  /* Error message styling */
+  .error-message {
+    color: #FF4F4F; /* Just for contrast if you want error in red */
+    text-align: center;
+    margin-top: 10px;
+  }
+  .password-container {
+    position: relative;
+    width: 100%;
+  }
+  
+  /* Ensure the password input has padding to accommodate the eye icon */
+  .password-container input[type="password"],
+  .password-container input[type="text"] {
+    width: 100%;
+    padding-right: 40px; /* Space for the eye icon */
+    box-sizing: border-box;
+  }
+  
+  /* Style for the eye icon */
+  .eye-icon {
+    user-select: none; /* Prevent text selection */
+  }

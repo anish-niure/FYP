@@ -1,0 +1,167 @@
+/* Custom Properties */
+:root {
+    --primary-bg: #121212;
+    --card-bg: #1a1a1a; /* Solid background for simplicity */
+    --gold-accent: #ffd700;
+    --text-light: #ccc;
+    --text-white: #ffffff;
+    --shadow-color: rgba(255, 215, 0, 0.3);
+    --spacing-sm: 15px;
+    --spacing-md: 20px;
+    --spacing-lg: 60px; /* Increased for more padding between reviews */
+    --spacing-xl: 60px;
+    --transition-ease: 0.3s ease;
+}
+
+/* Clients Page Styling */
+.clients-page {
+    background-color: var(--primary-bg);
+    color: var(--gold-accent);
+    min-height: 100vh;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden; /* Prevents horizontal overflow */
+}
+
+/* Header Section */
+.clients-header {
+    padding: var(--spacing-xl) var(--spacing-md) var(--spacing-lg);
+}
+
+.clients-header h1 {
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    font-weight: 700;
+    color: var(--gold-accent);
+    margin-bottom: var(--spacing-sm);
+    letter-spacing: 0.5px;
+}
+
+.clients-header p {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Client Reviews Section */
+.client-reviews {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Uniform card width */
+    gap: var(--spacing-lg); /* Consistent, generous padding between cards */
+    padding: var(--spacing-lg) var(--spacing-md); /* Padding around the grid */
+    flex-grow: 1;
+    max-width: 1200px; /* Limits width to prevent overflow */
+    margin: 0 auto; /* Centers the grid */
+    align-items: stretch; /* Ensures cards have uniform height */
+}
+
+/* Review Card */
+.review-card {
+    background-color: var(--card-bg);
+    padding: var(--spacing-md);
+    border-radius: 12px; /* Smaller radius for a cleaner look */
+    width: 100%;
+    transition: transform var(--transition-ease), box-shadow var(--transition-ease);
+    text-align: center;
+    border: 1px solid rgba(255, 215, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    overflow: hidden; /* Prevents content overflow within card */
+}
+
+.review-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 6px 16px var(--shadow-color);
+}
+
+/* Additional Review Card (for slide-in) */
+.review-card.additional {
+    margin-top: var(--spacing-md);
+}
+
+/* Client Image */
+.client-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: var(--spacing-sm);
+    object-fit: cover;
+    border: 2px solid var(--gold-accent);
+    image-rendering: crisp-edges;
+    filter: brightness(1.1) contrast(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Review Card Text */
+.review-card h3 {
+    font-size: 1.2rem;
+    color: var(--text-white);
+    margin-bottom: var(--spacing-sm);
+    font-weight: 600;
+}
+
+.review-card p {
+    font-size: 1rem;
+    color: var(--text-light);
+    font-style: italic;
+    line-height: 1.5;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    padding: var(--spacing-sm); /* Internal padding for text */
+}
+
+/* More Reviews Section */
+.more-reviews-section {
+    padding: var(--spacing-lg) var(--spacing-md);
+    text-align: center;
+}
+
+/* Show More Button */
+.show-more-btn {
+    background-color: var(--card-bg);
+    color: var(--gold-accent);
+    border: 2px solid var(--gold-accent);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color var(--transition-ease), color var(--transition-ease), transform var(--transition-ease);
+    margin-bottom: var(--spacing-md);
+}
+
+.show-more-btn:hover {
+    background-color: var(--gold-accent);
+    color: var(--primary-bg);
+    transform: translateY(-2px);
+}
+
+/* Additional Reviews Slide Animation */
+.additional-reviews {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s var(--transition-ease), opacity 0.5s var(--transition-ease);
+    opacity: 0;
+}
+
+.additional-reviews.slide-in {
+    max-height: 600px; /* Increased height for longer reviews */
+    opacity: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Match initial reviews */
+    gap: var(--spacing-lg); /* Consistent padding between additional cards */
+    padding: var(--spacing-md);
+    margin: 0 auto; /* Centers the grid */
+    max-width: 1200px; /* Limits width to prevent overflow */
+}
+
+/* Footer Styling */
+.clients-page > footer {
+    background-color: var(--card-bg);
+    color: var(--text-light);
+    padding: var(--spacing-md);
+    border-top: 1px solid rgba(255, 215, 0, 0.1);
+    font-size: 0.9rem;
+    width: 100%;
+    margin-top: var(--spacing-lg);
+}

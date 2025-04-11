@@ -1,0 +1,160 @@
+/* Overall container */
+.stylist-dashboard {
+  padding: 30px;
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: #000; /* Pure black background from Home.css */
+  color: #FFD700; /* Gold text from Home.css */
+  font-family: 'Arial', sans-serif;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2); /* Soft gold glow */
+}
+
+/* Headings */
+.stylist-dashboard h1,
+.profile-section h2,
+.bookings-section h2 {
+  color: #FFD700; /* Gold from Home.css */
+  margin: 0 0 20px 0;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3); /* Subtle gold glow */
+}
+
+/* Sections */
+.profile-section,
+.bookings-section {
+  margin: 30px 0;
+  border: 1px solid #FFD700; /* Gold border from Home.css */
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #111; /* Slightly lighter black from Home.css */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-section:hover,
+.bookings-section:hover {
+  transform: translateY(-5px); /* Lift effect like Home.css */
+  box-shadow: 0 4px 8px rgba(255, 215, 0, 0.4); /* Stronger gold glow */
+}
+
+/* Error message */
+.error {
+  color: #ff4d4d; /* Red for errors, kept for contrast */
+  margin: 10px 0;
+  font-weight: bold;
+}
+
+/* Buttons */
+.edit-button,
+.save-button,
+.cancel-button,
+.approve-button,
+.logout-button {
+  padding: 10px 20px;
+  margin: 5px;
+  border: 2px solid #FFD700; /* Gold border from Home.css */
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #FFD700; /* Gold background */
+  color: #000; /* Black text from Home.css */
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.edit-button:hover,
+.save-button:hover,
+.cancel-button:hover,
+.approve-button:hover,
+.logout-button:hover {
+  background-color: #111; /* Lighter black from Home.css */
+  color: #FFD700; /* Gold text on hover */
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); /* Gold glow like Home.css */
+}
+
+/* Input field */
+input {
+  padding: 10px;
+  margin: 8px 0;
+  width: 250px;
+  background-color: #111; /* Lighter black from Home.css */
+  color: #FFD700; /* Gold text */
+  border: 1px solid #FFD700; /* Gold border */
+  border-radius: 5px;
+  transition: border-color 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: #FFC107; /* Slightly darker gold for focus, inspired by Home.css */
+  box-shadow: 0 0 5px rgba(255, 215, 0, 0.4); /* Gold glow */
+}
+
+/* Table styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  border: 1px solid #FFD700; /* Gold border */
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.3); /* Subtle gold border */
+}
+
+th {
+  background-color: #111; /* Lighter black from Home.css */
+  color: #FFD700; /* Gold text */
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+td {
+  color: #FFD700; /* Gold text */
+}
+
+tbody tr:nth-child(even) {
+  background-color: #1a1a1a; /* Slightly lighter for contrast */
+}
+
+tbody tr:hover {
+  background-color: #222; /* Hover effect */
+  transition: background-color 0.2s ease;
+}
+
+/* Loading text */
+p {
+  color: #FFD700; /* Gold text */
+  font-style: italic;
+}
+h1{
+  padding-top: 50px;
+  text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .stylist-dashboard {
+      padding: 20px;
+      max-width: 100%;
+  }
+  
+  input {
+      width: 100%;
+  }
+  
+  .edit-button,
+  .save-button,
+  .cancel-button,
+  .approve-button,
+  .logout-button {
+      width: 100%;
+      margin: 5px 0;
+  }
+}

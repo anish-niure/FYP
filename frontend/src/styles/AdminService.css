@@ -1,0 +1,141 @@
+.admin-service {
+    padding: 3rem 1rem;
+    background: #000;
+    color: #ffd700;
+    min-height: 100vh;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+}
+
+.service-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-width: 500px;
+    margin: 0 auto 3rem;
+    padding: 1.5rem;
+    background: rgba(26, 26, 26, 0.9);
+    border-radius: 8px;
+    border: 1px solid #ffd700;
+}
+
+.service-form input,
+.service-form textarea {
+    padding: 0.75rem;
+    background: #1a1a1a;
+    color: #ffd700;
+    border: 1px solid #ffd700;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.service-form input:focus,
+.service-form textarea:focus {
+    outline: none;
+    border-color: #e6c200;
+}
+
+.service-form button {
+    padding: 0.75rem;
+    background: #ffd700;
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.service-form button:hover {
+    background: #e6c200;
+    transform: translateY(-2px);
+}
+
+.services-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.service-card {
+    background: rgba(26, 26, 26, 0.9);
+    border: 1px solid #ffd700;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
+}
+
+.service-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.service-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    color: #ffd700; /* Retained gold for titles */
+}
+
+.service-card p {
+    font-size: 0.95rem;
+    color: #ffffff; /* Changed to white for descriptions */
+    margin-bottom: 1rem;
+}
+
+.service-card button {
+    padding: 0.75rem;
+    background: #ffd700;
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.service-card button:hover {
+    background: #e6c200;
+    transform: translateY(-2px);
+}
+
+.error-message {
+    color: #ff4d4d;
+    background: rgba(255, 77, 77, 0.1);
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 1.25rem;
+    font-size: 0.95rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .admin-service {
+        padding: 2rem 0.5rem;
+    }
+
+    .service-form {
+        padding: 1rem;
+        margin: 0 1rem 2rem;
+    }
+
+    .services-list {
+        padding: 0 0.5rem;
+        gap: 1rem;
+    }
+
+    .service-card {
+        padding: 1rem;
+    }
+}
