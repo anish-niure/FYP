@@ -8,6 +8,7 @@ const AdminService = () => {
         name: '',
         description: '',
         priceRange: '',
+        image: null,
     });
     const [error, setError] = useState('');
 
@@ -49,6 +50,14 @@ const AdminService = () => {
         }));
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        setNewService(prev => ({
+            ...prev,
+            image: file,
+        }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -59,24 +68,27 @@ const AdminService = () => {
                 return;
             }
 
-            console.log('Sending POST request to /api/services');
-            const res = await axios.post('/api/services', newService, {
+            const formData = new FormData();
+            formData.append('name', newService.name);
+            formData.append('description', newService.description);
+            formData.append('priceRange', newService.priceRange);
+            if (newService.image) {
+                formData.append('image', newService.image); // Append the image file
+            }
+
+            const res = await axios.post('/api/services', formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'multipart/form-data',
                 },
             });
-            console.log('POST response:', res.data);
-            setNewService({ name: '', description: '', priceRange: '' });
+
+            setNewService({ name: '', description: '', priceRange: '', image: null });
             fetchServices();
             setError('');
             alert('Service added successfully!');
         } catch (error) {
             console.error('Error adding service:', error);
-            if (error.response) {
-                console.error('Response data:', error.response.data);
-                console.error('Response status:', error.response.status);
-            }
             setError(error.response?.data?.message || 'Failed to add service. Please try again.');
         }
     };
@@ -129,6 +141,11 @@ const AdminService = () => {
                     value={newService.priceRange}
                     onChange={handleChange}
                     required
+                />
+                <input
+                    type="file"
+                    name="image"
+                    onChange={handleFileChange}
                 />
                 <button type="submit">Add Service</button>
             </form>

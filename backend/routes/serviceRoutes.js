@@ -5,27 +5,16 @@ const path = require('path');
 const Service = require('../models/Service');
 const { verifyAdmin } = require('../middleware/authMiddleware');
 
-// Set up multer for image uploads (local storage)
+// Configure multer for file uploads
 const storage = multer.diskStorage({
-    destination: './uploads/',
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/'); // Directory to store uploaded files
+    },
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`);
     },
 });
-const upload = multer({ 
-    storage,
-    fileFilter: (req, file, cb) => {
-        const filetypes = /jpeg|jpg|png/;
-        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-        const mimetype = filetypes.test(file.mimetype);
-        if (extname && mimetype) {
-            return cb(null, true);
-        } else {
-            cb(new Error('Only images (jpeg, jpg, png) are allowed!'));
-        }
-    },
-    limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
-});
+const upload = multer({ storage });
 
 // GET all services (public)
 router.get('/', async (req, res) => {
@@ -41,21 +30,22 @@ router.get('/', async (req, res) => {
 
 // POST a new service (admin only)
 router.post('/', verifyAdmin, upload.single('image'), async (req, res) => {
-    console.log('POST /api/services hit');
     try {
-        // Validate required fields
         const { name, description, priceRange } = req.body;
-        if (!name || !description || !priceRange || !req.file) {
-            return res.status(400).json({ message: 'All fields (name, description, priceRange, image) are required' });
+
+        // Validate required fields
+        if (!name || !description || !priceRange) {
+            return res.status(400).json({ message: 'All fields (name, description, priceRange) are required' });
         }
 
-        const imageUrl = `/uploads/${req.file.filename}`;
+        const imageUrl = req.file ? `/uploads/${req.file.filename}` : ''; // Save image URL if uploaded
         const service = new Service({
             name,
             description,
             priceRange,
             imageUrl,
         });
+
         await service.save();
         res.status(201).json({ message: 'Service created successfully', service });
     } catch (error) {
