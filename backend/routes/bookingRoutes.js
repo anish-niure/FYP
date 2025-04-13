@@ -120,6 +120,19 @@ router.get('/stylist', authenticate, async (req, res) => {
     }
 });
 
+// GET all bookings (Admin access)
+router.get('/', authenticate, async (req, res) => {
+    try {
+        const bookings = await Booking.find()
+            .populate('userId', 'username email')
+            .populate('stylist', 'username email'); // Ensure stylist details are populated
+        res.json(bookings);
+    } catch (err) {
+        console.error('Error fetching bookings:', err);
+        res.status(500).json({ message: 'Failed to fetch bookings.' });
+    }
+});
+
 // PUT approve a booking
 router.put('/:id/approve', authenticate, async (req, res) => {
     try {
@@ -137,6 +150,42 @@ router.put('/:id/approve', authenticate, async (req, res) => {
         res.json({ message: 'Booking approved successfully!', booking });
     } catch (err) {
         res.status(500).json({ message: 'Server error approving booking.' });
+    }
+});
+
+// PUT update a booking
+router.put('/:id', authenticate, async (req, res) => {
+    const { status, dateTime, locationType, stylist } = req.body;
+
+    try {
+        const booking = await Booking.findById(req.params.id);
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found.' });
+        }
+
+        booking.status = status || booking.status;
+        booking.dateTime = dateTime ? new Date(dateTime) : booking.dateTime;
+        booking.locationType = locationType || booking.locationType;
+        booking.stylist = stylist || booking.stylist;
+
+        await booking.save();
+        res.json(booking);
+    } catch (err) {
+        console.error('Error updating booking:', err);
+        res.status(500).json({ message: 'Failed to update booking.' });
+    }
+});
+
+// DELETE a booking
+router.delete('/:id', authenticate, async (req, res) => {
+    try {
+        const booking = await Booking.findByIdAndDelete(req.params.id);
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found.' });
+        }
+        res.json({ message: 'Booking deleted successfully.' });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to delete booking.' });
     }
 });
 

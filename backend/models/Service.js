@@ -1,11 +1,12 @@
-// backend/models/Service.js
 const mongoose = require('mongoose');
 
 const serviceSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  priceRange: { type: String, required: true },
-  imageUrl: { type: String, required: false },  // Image URL field
-});
+    name: { type: String, required: true },
+    description: { type: String, required: true },
+    priceRange: { type: String, required: true },
+    imageUrl: { type: String, required: true },
+}, { timestamps: true });
 
-module.exports = mongoose.model('Service', serviceSchema);
+const Service = mongoose.model('Service', serviceSchema);
+
+module.exports = Service;
