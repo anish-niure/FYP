@@ -1,11 +1,20 @@
+// server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
+const cloudinary = require('cloudinary').v2; // Added for Cloudinary
 
 const app = express();
 dotenv.config();
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // CORS configuration
 const allowedOrigins = ['http://localhost:3000'];
@@ -18,7 +27,7 @@ app.use(cors({
 
 // Middleware
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true })); // Added for multipart/form-data
 
 // Root route
 app.get('/', (req, res) => {
@@ -47,7 +56,7 @@ console.log('Loaded routes:', {
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/bookings', bookingRoutes);
-app.use('/api', userRoutes); // 👈 Replace this line
+app.use('/api/user', userRoutes); // Fixed mounting path
 app.use('/api/stylists', stylistRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/services', serviceRoutes);
