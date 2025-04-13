@@ -2,74 +2,104 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 const { verifyAdmin } = require('../middleware/authMiddleware');
+const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
+
+// Configure multer for file uploads (using memory storage to upload directly to Cloudinary)
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // GET all products (public)
 router.get('/', async (req, res) => {
-    console.log('GET /api/products hit');
     try {
         const products = await Product.find();
         res.json(products);
     } catch (error) {
-        console.error('Error fetching products:', error);
         res.status(500).json({ message: 'Server error while fetching products' });
     }
 });
 
 // POST a new product (admin only)
-router.post('/', verifyAdmin, async (req, res) => {
-    console.log('POST /api/products hit');
+router.post('/', verifyAdmin, upload.single('image'), async (req, res) => {
     try {
-        // Validate required fields (imageUrl is optional)
-        const { name, description, price, imageUrl } = req.body;
+        const { name, description, price } = req.body;
+
+        // Validate required fields
         if (!name || !description || price === undefined) {
             return res.status(400).json({ message: 'Fields (name, description, price) are required' });
         }
 
-        const product = new Product({
-            name,
-            description,
-            price,
-            imageUrl: imageUrl || '', // Default to empty string if no imageUrl is provided
-        });
-        await product.save();
-        res.status(201).json({ message: 'Product created successfully', product });
+        const result = await cloudinary.uploader.upload_stream(
+            { resource_type: 'auto' },
+            async (error, result) => {
+                if (error) {
+                    return res.status(500).json({ error: error.message });
+                }
+
+                const imageUrl = result.secure_url; // Save the Cloudinary image URL
+                const product = new Product({
+                    name,
+                    description,
+                    price,
+                    imageUrl,
+                });
+
+                await product.save();
+                res.status(201).json({ message: 'Product created successfully', product });
+            }
+        ).end(req.file.buffer);  
     } catch (error) {
-        console.error('Error creating product:', error);
         res.status(500).json({ message: 'Server error while creating product' });
     }
 });
 
 // PUT update a product (admin only)
-router.put('/:id', verifyAdmin, async (req, res) => {
-    console.log(`PUT /api/products/${req.params.id} hit`);
+router.put('/:id', verifyAdmin, upload.single('image'), async (req, res) => {
     try {
-        const { name, description, price, imageUrl } = req.body;
-        const updateData = { 
-            name, 
-            description, 
-            price,
-            updatedAt: Date.now() 
-        };
+        const { name, description, price } = req.body;
+        const updateData = { name, description, price };
 
-        // Update imageUrl if provided
-        if (imageUrl !== undefined) {
-            updateData.imageUrl = imageUrl;
+        // If a new image is uploaded, update imageUrl
+        if (req.file) {
+            // Upload image to Cloudinary and get the URL
+            const result = await new Promise((resolve, reject) => {
+                cloudinary.uploader.upload_stream(
+                    { resource_type: 'auto' },
+                    (error, result) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(result);
+                        }
+                    }
+                ).end(req.file.buffer);
+            });
+
+            updateData.imageUrl = result.secure_url; // Save the Cloudinary image URL
         }
 
+        // Update the product with the new data
         const product = await Product.findByIdAndUpdate(req.params.id, updateData, { new: true });
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
         }
+
         res.json({ message: 'Product updated successfully', product });
     } catch (error) {
-        console.error('Error updating product:', error);
+        console.error(error);
         res.status(500).json({ message: 'Server error while updating product' });
     }
 });
 
 // DELETE a product (admin only)
 router.delete('/:id', verifyAdmin, async (req, res) => {
-    console.log(`DELETE /api/products/${req.params.id} hit`);
     try {
         const product = await Product.findByIdAndDelete(req.params.id);
         if (!product) {
@@ -77,7 +107,6 @@ router.delete('/:id', verifyAdmin, async (req, res) => {
         }
         res.json({ message: 'Product deleted successfully' });
     } catch (error) {
-        console.error('Error deleting product:', error);
         res.status(500).json({ message: 'Server error while deleting product' });
     }
 });

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider }  from './context/AuthContext';
 import Home from './pages/User/Home';
-import PrivacyPolicy from './pages/User/PrivacyPolicy';
 import Services from './pages/User/Services';
 import Navbar from './components/Navbar';
 import About from './pages/User/About';
@@ -18,7 +17,7 @@ import AdminDashboard from './pages/Admin/AdminDashboard';
 import AdminStylists from './pages/Admin/AdminStylists';
 import AdminService from './pages/Admin/AdminService';
 import AdminStore from './pages/Admin/AdminStore';
-
+import AdminAppointments from './pages/Admin/AdminAppointments';
 import Modal from './components/Modal';
 import ForgotPassword from './components/ForgotPassword';
 
@@ -32,7 +31,6 @@ function App() {
         <Routes>
           <Route path="/" element={<Home openModal={() => setModalOpen(true)} />} />
           <Route path="/services" element={<Services />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/user/about" element={<About />} />
           <Route path="/user/clients" element={<Clients />} />
           <Route path="/user/contact" element={<Contact />} />
@@ -48,6 +46,7 @@ function App() {
           <Route path="/admin/services" element={<AdminService />} />
           <Route path="/admin/store" element={<AdminStore />} />
           <Route path="/admin/user-management" element={<AdminUserManagement />} />
+          <Route path="/admin/appointments" element={<AdminAppointments />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
         <Modal isOpen={modalOpen} closeModal={() => setModalOpen(false)} />

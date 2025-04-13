@@ -19,8 +19,6 @@ app.use(cors({
 // Middleware
 app.use(express.json());
 
-// Serve static files from the uploads directory
-app.use('/uploads', express.static('uploads'));
 
 // Root route
 app.get('/', (req, res) => {
@@ -29,12 +27,12 @@ app.get('/', (req, res) => {
 
 // Import and mount routes with debug
 const authRoutes = require('./routes/authRoutes');
-const bookingRoutes = require('./routes/bookingRoutes');
 const userRoutes = require('./routes/userRoutes');
 const stylistRoutes = require('./routes/stylistRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const productRoutes = require('./routes/productRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
 
 console.log('Loaded routes:', {
     auth: authRoutes.stack.length > 0,
@@ -49,7 +47,7 @@ console.log('Loaded routes:', {
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/bookings', bookingRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api', userRoutes); // 👈 Replace this line
 app.use('/api/stylists', stylistRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/services', serviceRoutes);

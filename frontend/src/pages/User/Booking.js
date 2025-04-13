@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom'; // Import useLocation
 import '../../styles/Booking.css';
 
 const Booking = () => {
@@ -14,6 +15,10 @@ const Booking = () => {
     const [availableSlots, setAvailableSlots] = useState([]);
     const [error, setError] = useState('');
 
+    const location = useLocation(); // Get the current location
+    const queryParams = new URLSearchParams(location.search);
+    const serviceIdFromQuery = queryParams.get('serviceId'); // Extract serviceId from query params
+
     useEffect(() => {
         // Fetch services
         axios
@@ -21,6 +26,19 @@ const Booking = () => {
             .then((response) => {
                 setServices(response.data);
                 setError(''); // Clear any previous error
+
+                // Pre-select the service if serviceId is in the query params
+                if (serviceIdFromQuery) {
+                    const selectedService = response.data.find(
+                        (service) => service._id === serviceIdFromQuery
+                    );
+                    if (selectedService) {
+                        setFormData((prev) => ({
+                            ...prev,
+                            service: selectedService._id,
+                        }));
+                    }
+                }
             })
             .catch((err) => {
                 setError('Failed to load services: ' + (err.response?.data?.message || err.message));
@@ -36,7 +54,7 @@ const Booking = () => {
             .catch((err) => {
                 setError('Failed to load stylists: ' + (err.response?.data?.message || err.message));
             });
-    }, []);
+    }, [serviceIdFromQuery]); // Re-run if serviceIdFromQuery changes
 
     const handleDateChange = async (e) => {
         const date = e.target.value;
@@ -101,7 +119,7 @@ const Booking = () => {
                     >
                         <option value="">Select a service</option>
                         {services.map((service) => (
-                            <option key={service._id} value={service.name}>
+                            <option key={service._id} value={service._id}>
                                 {service.name}
                             </option>
                         ))}
