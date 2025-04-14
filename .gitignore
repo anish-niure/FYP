@@ -23,5 +23,5 @@ yarn-debug.log*
 yarn-error.log*
 backend/.env
 
-node_modules
-/Users/anishniure/Desktop/FYP/frontend/node_modules
+node_modules/
+/Users/anishniure/Desktop/FYP/frontend/node_modules/
