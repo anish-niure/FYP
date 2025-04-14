@@ -40,3 +40,6 @@ frontend/node_modules/.cache/default-development/
 
 # Ignore secrets
 .env
+
+# Ignore environment variables
+.env
