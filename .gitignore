@@ -29,3 +29,14 @@ node_modules/
 frontend/node_modules/.cache/default-development/14.pack
 frontend/node_modules/.cache/default-development/4.pack
 frontend/node_modules/.cache/default-development/10.pack
+
+# Ignore all node_modules folders
+node_modules/
+frontend/node_modules/
+
+# Ignore cache and temporary build files
+frontend/node_modules/.cache/
+frontend/node_modules/.cache/default-development/
+
+# Ignore secrets
+.env
