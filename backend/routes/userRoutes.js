@@ -5,6 +5,7 @@ const { authenticate, verifyAdmin } = require('../middleware/authMiddleware'); /
 const User = require('../models/User');
 const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
+const Notification = require('../models/Notification'); // Import Notification model
 
 // Configure multer to store the file in memory
 const upload = multer({ storage: multer.memoryStorage() });
@@ -62,6 +63,24 @@ router.post('/update', authenticate, upload.single('profilePicture'), async (req
   } catch (error) {
     console.error('Error updating user:', error);
     res.status(500).json({ message: 'Failed to update profile.' });
+  }
+});
+
+// Fetch notifications for a user or role
+router.get('/notifications', authenticate, async (req, res) => {
+  try {
+    const { role } = req.user;
+    const notifications = await Notification.find({
+      $or: [
+        { userId: req.user.id },
+        { role },
+      ],
+    }).sort({ date: -1 });
+
+    res.json(notifications);
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ message: 'Failed to fetch notifications.' });
   }
 });
 
