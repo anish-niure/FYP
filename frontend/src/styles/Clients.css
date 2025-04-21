@@ -19,7 +19,7 @@
     color: var(--gold-accent);
     min-height: 100vh;
     text-align: center;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Roboto', sans-serif; /* Updated to match the rest of the project */
     display: flex;
     flex-direction: column;
     overflow-x: hidden; /* Prevents horizontal overflow */
@@ -48,7 +48,7 @@
 /* Client Reviews Section */
 .client-reviews {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Uniform card width */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Adjust for smaller screens */
     gap: var(--spacing-lg); /* Consistent, generous padding between cards */
     padding: var(--spacing-lg) var(--spacing-md); /* Padding around the grid */
     flex-grow: 1;
@@ -128,12 +128,15 @@
     cursor: pointer;
     transition: background-color var(--transition-ease), color var(--transition-ease), transform var(--transition-ease);
     margin-bottom: var(--spacing-md);
+    font-weight: 500; /* Match button font weight */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add subtle shadow */
 }
 
 .show-more-btn:hover {
     background-color: var(--gold-accent);
     color: var(--primary-bg);
     transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Enhance hover shadow */
 }
 
 /* Additional Reviews Slide Animation */
@@ -148,7 +151,7 @@
     max-height: 600px; /* Increased height for longer reviews */
     opacity: 1;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Match initial reviews */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Match initial reviews for responsiveness */
     gap: var(--spacing-lg); /* Consistent padding between additional cards */
     padding: var(--spacing-md);
     margin: 0 auto; /* Centers the grid */

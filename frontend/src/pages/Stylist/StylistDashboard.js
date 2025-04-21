@@ -8,8 +8,8 @@ const StylistDashboard = () => {
   const [userInfo, setUserInfo] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [error, setError] = useState('');
-  const [editMode, setEditMode] = useState(false);
-  const [username, setUsername] = useState('');
+  const [secondaryRole, setSecondaryRole] = useState('');
+  const [description, setDescription] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -26,7 +26,6 @@ const StylistDashboard = () => {
       .then((response) => {
         console.log('User Info:', response.data); // Debug user ID
         setUserInfo(response.data);
-        setUsername(response.data.username);
         setError('');
       })
       .catch((error) => {
@@ -50,6 +49,21 @@ const StylistDashboard = () => {
         console.error('Error fetching bookings:', error.response?.data || error.message);
         setError('Failed to load bookings.');
       });
+
+    const fetchStylistDetails = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:5001/api/stylists/me', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setSecondaryRole(response.data.secondaryRole || '');
+        setDescription(response.data.description || '');
+      } catch (error) {
+        console.error('Error fetching stylist details:', error);
+      }
+    };
+
+    fetchStylistDetails();
   }, [navigate]);
 
   const handleApprove = async (bookingId) => {
@@ -74,20 +88,20 @@ const StylistDashboard = () => {
     }
   };
 
-  const handleSave = async () => {
-    const token = localStorage.getItem('token');
+  const handleUpdateDetails = async (e) => {
+    e.preventDefault();
     try {
-      const response = await axios.put(
-        'http://localhost:5001/api/user/update',
-        { username },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setUserInfo({ ...userInfo, username: response.data.username });
-      setEditMode(false);
-      setError('');
+      const token = localStorage.getItem('token');
+      const response = await axios.put('http://localhost:5001/api/stylists/update-details', {
+        secondaryRole,
+        description,
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      alert(response.data.message);
     } catch (error) {
-      console.error('Error updating profile:', error);
-      setError('Failed to update profile.');
+      console.error('Error updating stylist details:', error);
+      alert('Failed to update details.');
     }
   };
 
@@ -102,25 +116,11 @@ const StylistDashboard = () => {
 
       <div className="profile-section">
         <h2>Your Profile</h2>
-        {editMode ? (
-          <div>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Edit your username"
-            />
-            <button onClick={handleSave} className="save-button">Save</button>
-            <button onClick={() => setEditMode(false)} classClassName="cancel-button">Cancel</button>
-          </div>
-        ) : (
-          <div>
-            <p><strong>Username:</strong> {userInfo.username}</p>
-            <p><strong>Email:</strong> {userInfo.email}</p>
-            <p><strong>Role:</strong> {userInfo.role}</p>
-            <button onClick={() => setEditMode(true)} className="edit-button">Edit Username</button>
-          </div>
-        )}
+        <div>
+          <p><strong>Username:</strong> {userInfo.username}</p>
+          <p><strong>Email:</strong> {userInfo.email}</p>
+          <p><strong>Role:</strong> {userInfo.role}</p>
+        </div>
         <button
           onClick={() => {
             localStorage.removeItem('token');
@@ -169,6 +169,32 @@ const StylistDashboard = () => {
             </tbody>
           </table>
         )}
+      </div>
+
+      <div className="details-section">
+        <h2>Edit Your Details</h2>
+        <form onSubmit={handleUpdateDetails}>
+          <div>
+            <label htmlFor="secondaryRole">Secondary Role:</label>
+            <input
+              type="text"
+              id="secondaryRole"
+              value={secondaryRole}
+              onChange={(e) => setSecondaryRole(e.target.value)}
+              placeholder="e.g., Hair Stylist, Makeup Artist"
+            />
+          </div>
+          <div>
+            <label htmlFor="description">Description:</label>
+            <textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Write about your services, experience, and skills"
+            ></textarea>
+          </div>
+          <button type="submit">Update Details</button>
+        </form>
       </div>
     </div>
   );

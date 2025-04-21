@@ -26,4 +26,6 @@ const authorize = (roles) => {
 
 const verifyAdmin = [authenticate, authorize(['admin'])];
 
-module.exports = { authenticate, authorize, verifyAdmin };
+const verifyToken = authenticate; // Alias for authenticate middleware
+
+module.exports = { authenticate, authorize, verifyAdmin, verifyToken };

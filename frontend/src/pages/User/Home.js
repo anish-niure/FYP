@@ -12,12 +12,24 @@ const Home = ({ openModal }) => {
     const [services, setServices] = useState([]);
     const [error, setError] = useState('');
 
+    const isAuthenticated = () => !!localStorage.getItem('token'); // Check login status
+
+    const handleBookNowClick = (e, serviceId) => {
+        if (!isAuthenticated()) {
+            e.preventDefault(); // Prevent navigation
+            setIsModalOpen(true); // Open login/signup modal
+        } else {
+            window.location.href = `/booking?serviceId=${serviceId}`; // Navigate to booking page
+        }
+    };
+
     useEffect(() => {
         // Fetch services from the database
         const fetchServices = async () => {
             try {
                 const response = await axios.get('http://localhost:5001/api/services');
-                setServices(response.data);
+                const shuffledServices = response.data.sort(() => 0.5 - Math.random()); // Shuffle services
+                setServices(shuffledServices.slice(0, 3)); // Select 3 random services
             } catch (err) {
                 setError('Failed to load services. Please try again later.');
             }
@@ -45,7 +57,11 @@ const Home = ({ openModal }) => {
                                     <h3>{service.name}</h3>
                                     <p>{service.description}</p>
                                     <p>{service.priceRange}</p>
-                                    <Link to={`/booking?serviceId=${service._id}`} className="book-now-btn">
+                                    <Link
+                                        to={`/booking?serviceId=${service._id}`}
+                                        className="book-now-btn"
+                                        onClick={(e) => handleBookNowClick(e, service._id)}
+                                    >
                                         Book Now
                                     </Link>
                                 </div>
@@ -53,6 +69,9 @@ const Home = ({ openModal }) => {
                         ) : (
                             <p>No services available at the moment.</p>
                         )}
+                    </div>
+                    <div className="view-more">
+                        <Link to="/services" className="view-more-btn">View More Services</Link>
                     </div>
                 </section>
             </div>

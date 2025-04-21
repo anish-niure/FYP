@@ -17,6 +17,23 @@ const stylistSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  primaryRole: {
+    type: String,
+    default: 'stylist',
+    immutable: true,
+  },
+  secondaryRole: {
+    type: String,
+    default: '',
+  },
+  description: {
+    type: String,
+    default: '',
+  },
+  imageUrl: {
+    type: String,
+    default: '',
+  },
   createdAt: {
     type: Date,
     default: Date.now,

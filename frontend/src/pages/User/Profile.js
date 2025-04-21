@@ -13,13 +13,18 @@ const Profile = () => {
   const [user, setUser] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('myProfile'); // Default to 'myProfile'
   const [settingsMode, setSettingsMode] = useState(null);
   const [name, setName] = useState('');
   const [profilePicture, setProfilePicture] = useState(null);
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [resetToken, setResetToken] = useState(null);
-  const [showPopup, setShowPopup] = useState(false); // New state for popup
+  const [showPopup, setShowPopup] = useState(false);
+  const [role, setRole] = useState('');
+  const [description, setDescription] = useState('');
+  const [secondaryRole, setSecondaryRole] = useState('');
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -27,6 +32,7 @@ const Profile = () => {
     if (token) {
       setResetToken(token);
       setSettingsMode('resetPasswordWithToken');
+      setActiveTab('myProfile');
     }
   }, [location]);
 
@@ -44,7 +50,15 @@ const Profile = () => {
       .then((response) => {
         setUser(response.data);
         setName(response.data.username);
+        setRole(response.data.role || '');
+        setDescription(response.data.description || '');
+        setSecondaryRole(response.data.secondaryRole || '');
         setError('');
+
+        // If the user is an admin, set the active tab to 'myProfile' and hide other tabs
+        if (response.data.role === 'admin') {
+          setActiveTab('myProfile');
+        }
       })
       .catch((error) => {
         console.error('Error fetching profile:', error);
@@ -76,8 +90,8 @@ const Profile = () => {
       const response = await axios.post('http://localhost:5001/api/auth/forgot-password', {
         email: user.email,
       });
-      setShowPopup(true); // Show popup on success
-      setError(''); // Clear any previous errors
+      setShowPopup(true);
+      setError('');
     } catch (error) {
       console.error('Error sending reset email:', error.response?.data || error.message);
       setError(error.response?.data?.message || 'Failed to send reset email. Please try again.');
@@ -86,7 +100,7 @@ const Profile = () => {
 
   const handlePopupClose = () => {
     setShowPopup(false);
-    setSettingsMode(null); // Return to default settings view
+    setSettingsMode(null);
   };
 
   const handleCancelClick = () => {
@@ -167,142 +181,234 @@ const Profile = () => {
     navigate('/');
   };
 
-  if (!user && !error) return <p>Loading profile...</p>;
-  if (error && !showPopup) return <p style={{ color: error.includes('successful') ? 'green' : 'red' }}>{error}</p>;
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.put('http://localhost:5001/api/user/update-profile', {
+        role,
+        description,
+        secondaryRole,
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMessage(response.data.message);
+      // Update user state to reflect changes
+      setUser({ ...user, role, description, secondaryRole });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setMessage('Failed to update profile.');
+    }
+  };
+
+  if (!user && !error) return <p className="loading-text">Loading profile...</p>;
+  if (error && !showPopup) return <p className="error-text" style={{ color: error.includes('successful') ? '#28a745' : '#dc3545' }}>{error}</p>;
 
   return (
     <div className="profile-container">
-      <h1>Welcome, {user.username}</h1>
-      <div className="profile-info">
-        <img
-          src={user.profilePicture || placeholderImage}
-          alt="Profile"
-          className="profile-picture"
-        />
-        <p><strong>Username:</strong> {user.username}</p>
-        <p><strong>Email:</strong> {user.email}</p>
-        <p><strong>Role:</strong> {user.role}</p>
-
-        <h2>Settings</h2>
-        {settingsMode === null ? (
-          <div className="settings-options">
-            <button onClick={handleEditProfileClick} className="edit-button">
-              Edit Profile
+      <div className="profile-sidebar">
+        <button
+          className={`sidebar-button ${activeTab === 'myProfile' ? 'active' : ''}`}
+          onClick={() => setActiveTab('myProfile')}
+        >
+          My Profile
+        </button>
+        {role !== 'admin' && (
+          <>
+            <button
+              className={`sidebar-button ${activeTab === 'updateProfile' ? 'active' : ''}`}
+              onClick={() => setActiveTab('updateProfile')}
+            >
+              Update Profile
             </button>
-            <button onClick={handleResetPasswordClick} className="reset-password-button">
-              Reset Password
+            <button
+              className={`sidebar-button ${activeTab === 'bookings' ? 'active' : ''}`}
+              onClick={() => setActiveTab('bookings')}
+            >
+              Booking History
             </button>
-          </div>
-        ) : settingsMode === 'editProfile' ? (
-          <div className="edit-profile-section">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="profile-picture-input"
-            />
-            {profilePicture ? (
-              <img
-                src={URL.createObjectURL(profilePicture)}
-                alt="Profile Preview"
-                className="profile-picture"
-              />
-            ) : (
+            <button
+              className={`sidebar-button ${activeTab === 'purchases' ? 'active' : ''}`}
+              onClick={() => setActiveTab('purchases')}
+            >
+              Purchase History
+            </button>
+          </>
+        )}
+        <button onClick={handleLogout} className="logout-button">
+          Logout
+        </button>
+      </div>
+      <div className="profile-content">
+        {activeTab === 'myProfile' && (
+          <div className="my-profile-section">
+            <h2>My Profile</h2>
+            <div className="profile-info">
               <img
                 src={user.profilePicture || placeholderImage}
                 alt="Profile"
                 className="profile-picture"
               />
+              <p><strong>Username:</strong> {user.username}</p>
+              <p><strong>Email:</strong> {user.email}</p>
+              <p><strong>Role:</strong> {user.role}</p>
+              <div className="settings-options">
+                <button onClick={handleEditProfileClick} className="edit-button">
+                  Edit Profile
+                </button>
+                <button onClick={handleResetPasswordClick} className="reset-password-button">
+                  Reset Password
+                </button>
+              </div>
+              {settingsMode === 'editProfile' && (
+                <div className="edit-profile-section">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="profile-picture-input"
+                  />
+                  {profilePicture ? (
+                    <img
+                      src={URL.createObjectURL(profilePicture)}
+                      alt="Profile Preview"
+                      className="profile-picture"
+                    />
+                  ) : (
+                    <img
+                      src={user.profilePicture || placeholderImage}
+                      alt="Profile"
+                      className="profile-picture"
+                    />
+                  )}
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="edit-input"
+                  />
+                  <button onClick={handleSaveProfileClick} className="save-button">
+                    Save
+                  </button>
+                  <button onClick={handleCancelClick} className="cancel-button">
+                    Cancel
+                  </button>
+                </div>
+              )}
+              {settingsMode === 'resetPassword' && (
+                <div className="reset-password-section">
+                  <p>Requesting password reset...</p>
+                </div>
+              )}
+              {settingsMode === 'resetPasswordWithToken' && (
+                <div className="reset-password-section">
+                  <h3>Reset Your Password</h3>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="New Password"
+                    className="password-input"
+                    required
+                  />
+                  <input
+                    type="password"
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    placeholder="Confirm New Password"
+                    className="password-input"
+                    required
+                  />
+                  <button onClick={handleResetPasswordSubmit} className="save-button">
+                    Submit
+                  </button>
+                  <button onClick={handleCancelClick} className="cancel-button">
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        {role !== 'admin' && activeTab === 'updateProfile' && (
+          <div className="update-profile-section">
+            <h2>Update Profile</h2>
+            <form onSubmit={handleUpdateProfile}>
+              <div>
+                <label htmlFor="role">Role:</label>
+                <input
+                  type="text"
+                  id="role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  placeholder="e.g., Hair Stylist, Beautician"
+                />
+              </div>
+              <div>
+                <label htmlFor="secondaryRole">Secondary Role:</label>
+                <input
+                  type="text"
+                  id="secondaryRole"
+                  value={secondaryRole}
+                  onChange={(e) => setSecondaryRole(e.target.value)}
+                  placeholder="e.g., Hair Stylist, Makeup Artist"
+                />
+              </div>
+              <div>
+                <label htmlFor="description">Description:</label>
+                <textarea
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Write about your services, experience, and skills"
+                ></textarea>
+              </div>
+              <button type="submit">Update Profile</button>
+            </form>
+            {message && <p>{message}</p>}
+          </div>
+        )}
+        {role !== 'admin' && activeTab === 'bookings' && (
+          <div className="booking-history">
+            <h2>Booking History</h2>
+            {bookings.length === 0 ? (
+              <p>No bookings yet.</p>
+            ) : (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Service</th>
+                    <th>Stylist</th>
+                    <th>Date/Time</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bookings.map((booking) => (
+                    <tr key={booking._id}>
+                      <td>{booking.service}</td>
+                      <td>{booking.stylist?.username || 'N/A'}</td>
+                      <td>{new Date(booking.dateTime).toLocaleString()}</td>
+                      <td>{booking.locationType}</td>
+                      <td>{booking.status}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="edit-input"
-            />
-            <button onClick={handleSaveProfileClick} className="save-button">
-              Save
-            </button>
-            <button onClick={handleCancelClick} className="cancel-button">
-              Cancel
-            </button>
           </div>
-        ) : settingsMode === 'resetPassword' ? (
-          <div className="reset-password-section">
-            {/* This section is now handled by the popup */}
-            <p>Requesting password reset...</p>
-          </div>
-        ) : (
-          <div className="reset-password-section">
-            <h3>Reset Your Password</h3>
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="New Password"
-              className="password-input"
-              required
-            />
-            <input
-              type="password"
-              value={confirmNewPassword}
-              onChange={(e) => setConfirmNewPassword(e.target.value)}
-              placeholder="Confirm New Password"
-              className="password-input"
-              required
-            />
-            <button onClick={handleResetPasswordSubmit} className="save-button">
-              Submit
-            </button>
-            <button onClick={handleCancelClick} className="cancel-button">
-              Cancel
-            </button>
+        )}
+        {role !== 'admin' && activeTab === 'purchases' && (
+          <div className="purchases-section">
+            <h2>Purchase History</h2>
+            <p>
+              No purchases yet. Visit the <Link to="/store">store</Link> to explore products!
+            </p>
           </div>
         )}
       </div>
 
-      <div className="booking-history">
-        <h2>Booking History</h2>
-        {bookings.length === 0 ? (
-          <p>No bookings yet.</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Service</th>
-                <th>Stylist</th>
-                <th>Date/Time</th>
-                <th>Location</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bookings.map((booking) => (
-                <tr key={booking._id}>
-                  <td>{booking.service}</td>
-                  <td>{booking.stylist?.username || 'N/A'}</td>
-                  <td>{new Date(booking.dateTime).toLocaleString()}</td>
-                  <td>{booking.locationType}</td>
-                  <td>{booking.status}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      <div className="purchases-section">
-        <h2>Purchases</h2>
-        <p>
-          No purchases yet. Visit the <Link to="/store">store</Link> to explore products!
-        </p>
-      </div>
-
-      <button onClick={handleLogout} className="logout-button profile-logout">
-        Logout
-      </button>
-
-      {/* Popup Notification */}
       {showPopup && (
         <div className="popup-overlay">
           <div className="popup">

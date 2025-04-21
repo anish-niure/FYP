@@ -1,11 +1,12 @@
 // userRoutes.js
 const express = require('express');
 const router = express.Router();
-const { authenticate, verifyAdmin } = require('../middleware/authMiddleware'); // Fixed import
+const { authenticate, verifyAdmin, verifyToken } = require('../middleware/authMiddleware'); // Fixed import
 const User = require('../models/User');
 const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
 const Notification = require('../models/Notification'); // Import Notification model
+const Stylist = require('../models/Stylist'); // Import the Stylist model
 
 // Configure multer to store the file in memory
 const upload = multer({ storage: multer.memoryStorage() });
@@ -64,6 +65,37 @@ router.post('/update', authenticate, upload.single('profilePicture'), async (req
     console.error('Error updating user:', error);
     res.status(500).json({ message: 'Failed to update profile.' });
   }
+});
+
+// Update user profile (secondaryRole and description for stylists)
+router.put('/update-profile', verifyToken, async (req, res) => {
+    try {
+        const { secondaryRole, description } = req.body;
+
+        // Find the user
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // If the user is a stylist, update secondaryRole and description
+        if (user.role === 'stylist') {
+            const stylist = await Stylist.findOne({ userId: user._id });
+            if (!stylist) {
+                return res.status(404).json({ message: 'Stylist profile not found' });
+            }
+
+            if (secondaryRole) stylist.secondaryRole = secondaryRole;
+            if (description) stylist.description = description;
+
+            await stylist.save();
+        }
+
+        res.json({ message: 'Profile updated successfully' });
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        res.status(500).json({ message: 'Server error while updating profile' });
+    }
 });
 
 // Fetch notifications for a user or role

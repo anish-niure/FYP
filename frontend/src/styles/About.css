@@ -1,7 +1,7 @@
-/* Black and Gold Theme for About Us Page */
+/* frontend/src/styles/About.css */
 .about-page {
     background-color: #121212;
-    color: #ffd700;  /* Gold Text */
+    color: #ffd700; /* Gold Text */
     min-height: 100vh;
     font-family: 'Poppins', sans-serif;
 }
@@ -9,33 +9,41 @@
 /* Header Section */
 .about-header {
     text-align: center;
-    padding: 60px 20px;
+    padding: 80px 20px;
     background: linear-gradient(to right, #1a1a1a, #000000);
+    border-bottom: 2px solid #ffd700;
 }
 
 .about-header h1 {
-    font-size: 3rem;
-    font-weight: bold;
+    font-size: 3.5rem;
+    font-weight: 700;
     color: #ffd700;
+    margin-bottom: 15px;
 }
 
 .about-header span {
-    color: white;
+    color: #ffffff;
 }
 
 .about-header p {
-    font-size: 1.2rem;
-    color: #ccc;
-    margin-top: 10px;
+    font-size: 1.3rem;
+    color: #cccccc;
+    font-style: italic;
 }
 
-/* About Content */
+/* About Content (Shared for Our Story and Our Future Goals) */
 .about-content {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 60px;
-    gap: 40px;
+    padding: 80px 40px;
+    gap: 50px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.about-content.future-goals {
+    flex-direction: row-reverse; /* Image on left, text on right for Future Goals */
 }
 
 .about-text {
@@ -44,14 +52,18 @@
 }
 
 .about-text h2 {
-    font-size: 2.2rem;
+    font-size: 2.5rem;
     color: #ffd700;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ffd700;
+    padding-bottom: 10px;
 }
 
 .about-text p {
-    font-size: 1.1rem;
-    color: #ccc;
-    line-height: 1.6;
+    font-size: 1.2rem;
+    color: #cccccc;
+    line-height: 1.8;
+    margin-bottom: 15px;
 }
 
 /* Image Section */
@@ -62,55 +74,45 @@
 
 .about-image img {
     width: 100%;
-    border-radius: 10px;
-    box-shadow: 0px 0px 15px rgba(255, 215, 0, 0.3);
-}
-
-/* Team Section */
-.team-section {
-    text-align: center;
-    padding: 60px 20px;
-}
-
-.team-section h2 {
-    font-size: 2.5rem;
-    margin-bottom: 30px;
-    color: #ffd700;
-}
-
-.team-grid {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    flex-wrap: wrap;
-}
-
-.team-member {
-    background-color: #1a1a1a;
-    padding: 20px;
-    border-radius: 10px;
+    border-radius: 12px;
+    box-shadow: 0px 0px 20px rgba(255, 215, 0, 0.3);
     transition: transform 0.3s ease;
-    text-align: center;
-    width: 200px;
 }
 
-.team-member:hover {
-    transform: scale(1.05);
+.about-image img:hover {
+    transform: scale(1.02);
 }
 
-.team-member img {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    margin-bottom: 15px;
-}
+/* Responsive Design */
+@media (max-width: 768px) {
+    .about-content {
+        flex-direction: column;
+        padding: 40px 20px;
+        gap: 30px;
+    }
 
-.team-member h3 {
-    font-size: 1.2rem;
-    color: white;
-}
+    .about-content.future-goals {
+        flex-direction: column; /* Stack vertically on mobile */
+    }
 
-.team-member p {
-    font-size: 1rem;
-    color: #ccc;
+    .about-text,
+    .about-image {
+        max-width: 100%;
+    }
+
+    .about-header h1 {
+        font-size: 2.5rem;
+    }
+
+    .about-header p {
+        font-size: 1rem;
+    }
+
+    .about-text h2 {
+        font-size: 2rem;
+    }
+
+    .about-text p {
+        font-size: 1rem;
+    }
 }

@@ -30,6 +30,15 @@ const Navbar = ({ openModal }) => {
     console.log('Notification clicked');
   };
 
+  const handleBookAppointmentClick = (e) => {
+    if (!user) {
+      e.preventDefault(); // Prevent navigation
+      openModal(); // Open login/signup modal
+    } else {
+      navigate('/booking'); // Navigate to booking page
+    }
+  };
+
   return (
     <nav className="navbar">
       <div className="nav-left">
@@ -40,7 +49,9 @@ const Navbar = ({ openModal }) => {
             <li><Link to="/user/about">About Us</Link></li>
             <li><Link to="/user/clients">Our Clients</Link></li>
             <li><Link to="/user/contact">Contact Info</Link></li>
-            <li><Link to="/booking">Book Appointment</Link></li>
+            <li>
+              <Link to="/booking" onClick={handleBookAppointmentClick}>Book Appointment</Link>
+            </li>
             <li><Link to="/store">Store</Link></li>
 
             {/* Admin and Stylist Dashboard Links */}

@@ -31,25 +31,15 @@ const AboutUs = () => {
                 </div>
             </div>
 
-            {/* Team Section */}
-            <div className="team-section">
-                <h2>Meet Our Experts</h2>
-                <div className="team-grid">
-                    <div className="team-member">
-                        <img src="https://via.placeholder.com/150" alt="Stylist" />
-                        <h3>Emily Johnson</h3>
-                        <p>Senior Stylist</p>
-                    </div>
-                    <div className="team-member">
-                        <img src="https://via.placeholder.com/150" alt="Therapist" />
-                        <h3>Michael Lee</h3>
-                        <p>Massage Therapist</p>
-                    </div>
-                    <div className="team-member">
-                        <img src="https://via.placeholder.com/150" alt="Nail Artist" />
-                        <h3>Sophia Kim</h3>
-                        <p>Nail Artist</p>
-                    </div>
+            <div className="about-content">
+                <div className="about-image">
+                    <img src="https://images.unsplash.com/photo-1642759464832-5d8290d987fd?q=80&w=2754&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Future Goals" />
+                </div>
+                <div className="about-text">
+                    <h2>Our Future Goals</h2>
+                    <p>
+                        At our salon, we envision a future where everyone has access to top-notch beauty and grooming services. Our goal is to expand our reach, ensuring that our services are available to every community, no matter how remote. We aim to innovate and adapt to the latest trends and technologies, providing our clients with the best possible experience. Together, we strive to make beauty and self-care accessible to all.
+                    </p>
                 </div>
             </div>
 

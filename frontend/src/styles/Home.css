@@ -151,6 +151,20 @@
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(212, 175, 55, 0.3);
   }
+  .view-more-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #D4AF37;
+    color: #0A0A0A; /* Black text on gold button */
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    margin-top: 20px;
+  }
   
   /* Responsive adjustments */
   @media (max-width: 768px) {

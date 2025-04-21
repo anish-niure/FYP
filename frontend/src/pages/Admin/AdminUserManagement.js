@@ -1,42 +1,55 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import '../../styles/AdminUserManagement.css'; // For custom styling
+import { useNavigate } from 'react-router-dom';
+import '../../styles/AdminUserManagement.css';
 
 const AdminUserManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const navigate = useNavigate();
 
-  // Fetch all users
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const token = localStorage.getItem('token');
-      console.log('Token:', token);
-      setLoading(true);
-      try {
-        const response = await axios.get('http://localhost:5001/api/users', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        console.log('Users:', response.data);
-        setUsers(response.data);
-      } catch (err) {
-        console.error('Error:', err.response?.data || err.message);
-        setError('Failed to load users.');
-      } finally {
-        setLoading(false);
+  const token = localStorage.getItem('token');
+
+  const fetchUsers = useCallback(async () => {
+    if (!token) {
+      navigate('/');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      const response = await axios.get('http://localhost:5001/api/user/users', { // Changed to /api/user/users
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUsers(response.data);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      const errorMessage = err.response?.data?.message || 'Failed to load users. Please try again.';
+      setError(errorMessage);
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        localStorage.removeItem('token');
+        navigate('/');
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  }, [token, navigate]);
+
+  useEffect(() => {
     fetchUsers();
-  }, []);
-  // Handle blocking/unblocking user
+  }, [fetchUsers]);
+
   const handleBlock = async (id) => {
     try {
       setLoading(true);
+      setError('');
+      setSuccess('');
       const response = await axios.patch(
-        `http://localhost:5001/api/block-user/${id}`,
+        `http://localhost:5001/api/user/block-user/${id}`,
         {},
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setSuccess(response.data.message);
       setUsers((prevUsers) =>
@@ -45,44 +58,51 @@ const AdminUserManagement = () => {
         )
       );
     } catch (err) {
-      setError('Failed to block/unblock user.');
+      console.error('Error toggling block status:', err);
+      const errorMessage = err.response?.data?.message || 'Failed to block/unblock user.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle deleting user
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      try {
-        setLoading(true);
-        await axios.delete(`http://localhost:5001/api/users/${id}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        });
-        setSuccess('User deleted successfully!');
-        setUsers(users.filter((user) => user._id !== id));
-      } catch (err) {
-        setError('Failed to delete user.');
-      } finally {
-        setLoading(false);
-      }
+    if (!window.confirm('Are you sure you want to delete this user?')) return;
+    try {
+      setLoading(true);
+      setError('');
+      setSuccess('');
+      await axios.delete(`http://localhost:5001/api/user/users/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setSuccess('User deleted successfully!');
+      setUsers((prevUsers) => prevUsers.filter((user) => user._id !== id));
+    } catch (err) {
+      console.error('Error deleting user:', err);
+      const errorMessage = err.response?.data?.message || 'Failed to delete user.';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Handle password reset
   const handleResetPassword = async (id) => {
     const newPassword = prompt('Enter new password:');
     if (!newPassword) return;
     try {
       setLoading(true);
+      setError('');
+      setSuccess('');
       await axios.put(
-        `http://localhost:5001/api/reset-password/${id}`,
+        `http://localhost:5001/api/user/reset-password/${id}`,
         { password: newPassword },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setSuccess('Password reset successfully!');
     } catch (err) {
-      setError('Failed to reset password.');
+      console.error('Error resetting password:', err);
+      const errorMessage = err.response?.data?.message || 'Failed to reset password.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -96,6 +116,8 @@ const AdminUserManagement = () => {
 
       {loading ? (
         <p>Loading...</p>
+      ) : users.length === 0 ? (
+        <p>No users available.</p>
       ) : (
         <table className="user-table">
           <thead>
@@ -115,13 +137,15 @@ const AdminUserManagement = () => {
                 <td>{user.role}</td>
                 <td>{user.isBlocked ? 'Blocked' : 'Active'}</td>
                 <td>
-                  <button onClick={() => handleBlock(user._id)}>
+                  <button onClick={() => handleBlock(user._id)} disabled={loading}>
                     {user.isBlocked ? 'Unblock' : 'Block'}
                   </button>
-                  <button onClick={() => handleResetPassword(user._id)}>
+                  <button onClick={() => handleResetPassword(user._id)} disabled={loading}>
                     Reset Password
                   </button>
-                  <button onClick={() => handleDelete(user._id)}>Delete</button>
+                  <button onClick={() => handleDelete(user._id)} disabled={loading}>
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
