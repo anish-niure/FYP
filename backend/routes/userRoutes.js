@@ -25,7 +25,7 @@ router.get('/users', verifyAdmin, async (req, res) => {
 router.post('/update', authenticate, upload.single('profilePicture'), async (req, res) => {
   try {
     const userId = req.user.id; // From authenticate middleware
-    const { username } = req.body;
+    const { username, phoneNumber, gender, location } = req.body;
     let profilePictureUrl = null;
 
     // Handle image upload to Cloudinary if a file is provided
@@ -47,6 +47,9 @@ router.post('/update', authenticate, upload.single('profilePicture'), async (req
     // Prepare updates
     const updates = {};
     if (username) updates.username = username;
+    if (phoneNumber) updates.phoneNumber = phoneNumber;
+    if (gender) updates.gender = gender;
+    if (location) updates.location = location;
     if (profilePictureUrl) updates.profilePicture = profilePictureUrl;
 
     // Update the user in MongoDB
@@ -63,7 +66,19 @@ router.post('/update', authenticate, upload.single('profilePicture'), async (req
     res.json(updatedUser);
   } catch (error) {
     console.error('Error updating user:', error);
-    res.status(500).json({ message: 'Failed to update profile.' });
+    if (error.name === 'ValidationError') {
+      console.error('Validation error details:', error.errors);
+      return res.status(400).json({ message: 'Validation error', details: error.errors });
+    } else if (error.name === 'MongoError') {
+      console.error('Database error details:', error.message);
+      return res.status(500).json({ message: 'Database error', details: error.message });
+    } else if (error.message.includes('Cloudinary')) {
+      console.error('Cloudinary upload error details:', error.message);
+      return res.status(500).json({ message: 'Cloudinary upload error', details: error.message });
+    } else {
+      console.error('Unexpected error details:', error.message);
+      return res.status(500).json({ message: 'Unexpected server error', details: error.message });
+    }
   }
 });
 

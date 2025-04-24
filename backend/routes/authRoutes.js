@@ -35,8 +35,35 @@ router.post('/test-email', async (req, res) => {
 
 // Signup Route (for regular users)
 router.post('/signup', async (req, res) => {
-  const { username, email, password } = req.body;
+  const { firstName, lastName, email, password, phoneNumber, gender, confirmPassword, location } = req.body;
+
+  // Combine firstName and lastName into username for backward compatibility
+  const username = `${firstName} ${lastName}`;
+
   try {
+    // Validate phone number
+    if (!/^[0-9]{10}$/.test(phoneNumber)) {
+      return res.status(400).json({ message: 'Phone number must be 10 digits long.' });
+    }
+
+    // Validate gender
+    if (!['Male', 'Female', 'Other'].includes(gender)) {
+      return res.status(400).json({ message: 'Invalid gender option selected.' });
+    }
+
+    // Validate password confirmation
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: 'Passwords do not match.' });
+    }
+
+    // Validate password strength
+    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{5,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        message: 'Password must be at least 5 characters long, contain at least one number, and one special character (!, @, #, $, etc.).',
+      });
+    }
+
     // Check if user already exists
     const user = await User.findOne({ email });
     if (user) {
@@ -44,8 +71,8 @@ router.post('/signup', async (req, res) => {
       return res.status(400).json({ message: 'User already exists.' });
     }
 
-    // Create new user with role 'user'
-    const newUser = new User({ username, email, password, role: 'user' });
+    // Create new user with additional fields
+    const newUser = new User({ firstName, lastName, username, email, password, phoneNumber, gender, location, role: 'user' });
     const salt = await bcrypt.genSalt(10);
     newUser.password = await bcrypt.hash(password, salt);
     await newUser.save();

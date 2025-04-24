@@ -23,12 +23,24 @@ const Modal = ({ isOpen, closeModal }) => {
 
     const formData = new FormData(e.target);
     const payload = {
-      username: formData.get('username'),
+      firstName: formData.get('firstName'),
+      lastName: formData.get('lastName'),
       email: formData.get('email'),
       password: formData.get('password'),
+      phoneNumber: formData.get('phoneNumber'),
+      gender: formData.get('gender'),
+      confirmPassword: formData.get('confirmPassword'),
+      location: formData.get('location'),
     };
 
-    if (isLogin) delete payload.username;
+    if (isLogin) {
+      delete payload.firstName;
+      delete payload.lastName;
+      delete payload.phoneNumber;
+      delete payload.gender;
+      delete payload.confirmPassword;
+      delete payload.location;
+    }
 
     try {
       const response = await fetch(endpoint, {
@@ -64,12 +76,52 @@ const Modal = ({ isOpen, closeModal }) => {
         <h2>{isLogin ? 'Login' : 'Sign Up'}</h2>
         <form onSubmit={handleSubmit}>
           {!isLogin && (
-            <input
-              type="text"
-              name="username"
-              placeholder="Username"
-              required
-            />
+            <>
+              <h3 style={{ fontSize: '1.2rem', marginBottom: '10px' }}>Personal Information</h3>
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+                <input
+                  type="text"
+                  name="firstName"
+                  placeholder="First Name"
+                  required
+                  style={{ flex: 1, padding: '8px', fontSize: '0.9rem' }}
+                />
+                <input
+                  type="text"
+                  name="lastName"
+                  placeholder="Last Name"
+                  required
+                  style={{ flex: 1, padding: '8px', fontSize: '0.9rem' }}
+                />
+              </div>
+              <input
+                type="text"
+                name="phoneNumber"
+                placeholder="Phone Number"
+                pattern="\d{10}"
+                title="Phone number must be 10 digits long."
+                required
+                style={{ marginBottom: '10px', width: '100%', padding: '8px', fontSize: '0.9rem' }}
+              />
+              <select
+                name="gender"
+                required
+                style={{ marginBottom: '10px', width: '100%', padding: '8px', fontSize: '0.9rem' }}
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+              <input
+                type="text"
+                name="location"
+                placeholder="Location"
+                required
+                style={{ marginBottom: '10px', width: '100%', padding: '8px', fontSize: '0.9rem' }}
+              />
+              <h3 style={{ fontSize: '1.2rem', marginBottom: '10px' }}>Account Details</h3>
+            </>
           )}
           <input
             type="email"
@@ -92,6 +144,14 @@ const Modal = ({ isOpen, closeModal }) => {
               {showPassword ? '👁️' : '👁️‍🗨️'}
             </span>
           </div>
+          {!isLogin && (
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              required
+            />
+          )}
           {isLogin && (
             <div className="forgot-password">
               <Link to="/forgot-password">Forgot your password?</Link>
