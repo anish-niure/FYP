@@ -24,7 +24,7 @@ const StylistDashboard = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        console.log('User Info:', response.data); // Debug user ID
+        console.log('User Info:', response.data);
         setUserInfo(response.data);
         setError('');
       })
@@ -42,11 +42,17 @@ const StylistDashboard = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        console.log('Bookings:', response.data); // Debug bookings
+        console.log('Bookings for stylist:', response.data); 
+        // Check if any bookings were returned
+        if (response.data.length === 0) {
+          console.log('No bookings found for this stylist');
+        } else {
+          console.log('First booking:', response.data[0]);
+        }
         setBookings(response.data);
       })
       .catch((error) => {
-        console.error('Error fetching bookings:', error.response?.data || error.message);
+        console.error('Error fetching stylist bookings:', error.response?.data || error.message);
         setError('Failed to load bookings.');
       });
 
@@ -69,13 +75,13 @@ const StylistDashboard = () => {
   const handleApprove = async (bookingId) => {
     const token = localStorage.getItem('token');
     try {
-      console.log('Approving booking:', bookingId, 'with token:', token); // Debug
+      console.log('Approving booking:', bookingId, 'with token:', token);
       const response = await axios.put(
         `http://localhost:5001/api/bookings/${bookingId}/approve`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log('Approval response:', response.data); // Debug response
+      console.log('Approval response:', response.data);
       setBookings(
         bookings.map((booking) =>
           booking._id === bookingId ? response.data.booking : booking
@@ -120,6 +126,7 @@ const StylistDashboard = () => {
           <p><strong>Username:</strong> {userInfo.username}</p>
           <p><strong>Email:</strong> {userInfo.email}</p>
           <p><strong>Role:</strong> {userInfo.role}</p>
+          <p><strong>Specialization:</strong> {secondaryRole}</p>
         </div>
         <button
           onClick={() => {
@@ -133,68 +140,56 @@ const StylistDashboard = () => {
       </div>
 
       <div className="bookings-section">
-        <h2>Your Bookings</h2>
+        <h2>Client Bookings</h2>
         {bookings.length === 0 ? (
           <p>No bookings yet.</p>
         ) : (
           <table>
             <thead>
               <tr>
-                <th>Service</th>
                 <th>Client</th>
+                <th>Service(s)</th>
                 <th>Date & Time</th>
-                <th>Status</th>
-                <th>Action</th>
+                <th>Location</th>
+                {/* <th>Status</th> */}
+                {/* <th>Action</th> */}
               </tr>
             </thead>
             <tbody>
               {bookings.map((booking) => (
                 <tr key={booking._id}>
-                  <td>{booking.service}</td>
                   <td>{booking.userId?.username || 'Unknown'}</td>
-                  <td>{new Date(booking.dateTime).toLocaleString()}</td>
-                  <td>{booking.status}</td>
                   <td>
-                    {booking.status === 'Pending' && (
+                    {booking.services ? (
+                      Array.isArray(booking.services) ? (
+                        booking.services.map(service => 
+                          typeof service === 'object' ? service.name : service
+                        ).join(', ')
+                      ) : (
+                        typeof booking.services === 'object' ? booking.services.name : booking.services
+                      )
+                    ) : (
+                      'Not specified'
+                    )}
+                  </td>
+                  <td>{new Date(booking.dateTime).toLocaleString()}</td>
+                  <td>{booking.locationType || 'Not specified'}</td>
+                  {/* <td>{booking.status}</td> */}
+                  <td>
+                    {/* {booking.status === 'Pending' && (
                       <button
                         onClick={() => handleApprove(booking._id)}
                         className="approve-button"
                       >
                         Approve
                       </button>
-                    )}
+                    )} */}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         )}
-      </div>
-
-      <div className="details-section">
-        <h2>Edit Your Details</h2>
-        <form onSubmit={handleUpdateDetails}>
-          <div>
-            <label htmlFor="secondaryRole">Secondary Role:</label>
-            <input
-              type="text"
-              id="secondaryRole"
-              value={secondaryRole}
-              onChange={(e) => setSecondaryRole(e.target.value)}
-              placeholder="e.g., Hair Stylist, Makeup Artist"
-            />
-          </div>
-          <div>
-            <label htmlFor="description">Description:</label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Write about your services, experience, and skills"
-            ></textarea>
-          </div>
-          <button type="submit">Update Details</button>
-        </form>
       </div>
     </div>
   );

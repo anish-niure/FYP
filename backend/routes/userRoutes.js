@@ -80,13 +80,9 @@ router.post('/update', authenticate, async (req, res) => {
 
     // Prepare updates
     const updates = {};
-    if (username) {
-      const nameParts = username.split(' ');
-      updates.firstName = nameParts[0] || '';
-      updates.lastName = nameParts.slice(1).join(' ') || '';
-    }
+    if (username) updates.username = username;
     if (phoneNumber) updates.phoneNumber = phoneNumber;
-    if (gender) updates.gender = gender;
+    if (gender) updates.gender = gender.toLowerCase(); // Convert to lowercase to match schema enum
     if (location) updates.location = location;
     if (email) {
       // Check for email uniqueness

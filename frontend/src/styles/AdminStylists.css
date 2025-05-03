@@ -45,88 +45,162 @@
   margin-bottom: 20px;
 }
 
+/* Form Layout Improvements to match Profile page */
 .create-stylist-form {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  max-width: 400px;
+  max-width: 500px;
   margin: 0 auto 40px;
-  padding: 20px;
-  background-color: #2A3435; /* Slightly lighter black */
-  border: 2px solid #FFC107; /* Yellow/Gold border */
-  border-radius: 8px;
+  padding: 30px;
+  background-color: #1a1a1a;
+  border: 2px solid #d4af37;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(212, 175, 55, 0.2);
 }
 
-.create-stylist-form input {
-  padding: 10px;
-  font-size: 1rem;
-  border: 1px solid #FFC107;
-  border-radius: 5px;
-  background-color: #FFFFFF;
-  color: #000000;
+.create-stylist-form h2 {
+  font-size: 28px;
+  color: #d4af37;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 10px;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-.create-stylist-form input:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
-
-.create-stylist-form button {
-  padding: 10px;
-  background-color: #FFC107; /* Yellow/Gold */
-  color: #000000;
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.create-stylist-form button:hover:not(:disabled) {
-  background-color: #E0A800; /* Darker Yellow/Gold */
-}
-
-.create-stylist-form button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
-
-.create-stylist-form select.role-dropdown,
-.create-stylist-form textarea.stylist-description {
-  padding: 10px;
-  font-size: 1rem;
-  border: 1px solid #FFC107;
-  border-radius: 5px;
-  background-color: #FFFFFF;
-  color: #000000;
+/* Form field styling to match Profile page */
+.form-group {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
   width: 100%;
 }
 
-.create-stylist-form textarea.stylist-description {
-  resize: vertical;
-  min-height: 80px;
+.form-group label {
+  text-align: right;
+  font-weight: bold;
+  color: #d4af37;
 }
 
-.create-stylist-form select.role-dropdown:focus,
-.create-stylist-form textarea.stylist-description:focus {
+.create-stylist-form input,
+.create-stylist-form select,
+.create-stylist-form textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #d4af37;
+  background-color: #3a3a3a;
+  color: #d4af37;
+  font-size: 16px;
+}
+
+.create-stylist-form input:focus,
+.create-stylist-form select:focus,
+.create-stylist-form textarea:focus {
   outline: none;
-  border-color: #E0A800;
-  box-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
+  border-color: #b8972f;
+  box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
 }
 
-.create-stylist-form select.role-dropdown:disabled,
-.create-stylist-form textarea.stylist-description:disabled {
-  background-color: #cccccc;
+.create-stylist-form input:disabled,
+.create-stylist-form select:disabled,
+.create-stylist-form textarea:disabled {
+  opacity: 0.8;
   cursor: not-allowed;
 }
 
-.create-stylist-form .file-hint {
-  font-size: 0.8rem;
-  color: #FFC107;
-  margin-top: -10px;
-  margin-bottom: 5px;
+/* File input styling */
+.profile-picture-field {
+  grid-template-columns: 1fr;
+  margin-top: 20px;
+}
+
+.file-input-label {
+  text-align: center;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #d4af37;
+}
+
+.file-input {
+  background-color: #3a3a3a;
+  color: #d4af37;
+  border: 1px solid #d4af37;
+  border-radius: 4px;
+  padding: 8px;
+  margin-top: 5px;
+  width: 100%;
+}
+
+.file-hint {
+  color: #d4af37;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 5px;
+}
+
+/* Fix profile picture field alignment - this replaces ALL previous profile-picture-field styles */
+.form-group.profile-picture-field {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  align-items: start; /* Changed from center to align with the top */
+  gap: 15px;
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.form-group.profile-picture-field .file-input-label {
+  text-align: right;
+  font-weight: bold;
+  color: #d4af37;
+}
+
+/* Remove the nested div and fix the file input styling */
+.file-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #d4af37;
+  background-color: #3a3a3a;
+  color: #d4af37;
+}
+
+/* Fix hint text placement */
+.file-hint {
+  grid-column: 2;
+  text-align: left;
+  color: #d4af37;
+  font-size: 0.9rem;
+  margin-top: 5px;
+  margin-left: 0; /* Remove conflicting margin */
+  padding-left: 0; /* Remove conflicting padding */
+}
+
+/* Button styling to match Profile page */
+.form-button {
+  align-self: center;
+  padding: 10px 20px;
+  background-color: #d4af37;
+  color: #1a1a1a;
+  border: 2px solid #d4af37;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s, color 0.3s;
+  margin-top: 10px;
+}
+
+.form-button:hover:not(:disabled) {
+  background-color: #b8972f;
+}
+
+.form-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .stylists-table {

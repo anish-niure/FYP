@@ -5,6 +5,7 @@ import '../../styles/AdminAppointments.css';
 const AdminAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [stylists, setStylists] = useState([]);
+  const [services, setServices] = useState([]);
   const [error, setError] = useState('');
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -51,8 +52,26 @@ const AdminAppointments = () => {
       }
     };
 
+    const fetchServices = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          setError('Please log in as an admin to view services.');
+          return;
+        }
+
+        const response = await axios.get('http://localhost:5001/api/services', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setServices(response.data);
+      } catch (err) {
+        setError('Failed to fetch services: ' + (err.response?.data?.message || err.message));
+      }
+    };
+
     fetchAppointments();
     fetchStylists();
+    fetchServices();
   }, []);
 
   const handleEditClick = (appointment) => {
@@ -143,15 +162,36 @@ const AdminAppointments = () => {
           <tbody>
             {appointments.map((appointment) => (
               <tr key={appointment._id}>
-                <td>{appointment.service}</td>
+                <td>
+                  {Array.isArray(appointment.services) && appointment.services.length > 0
+                    ? appointment.services.map(serviceId => {
+                        const service = services.find(s => s._id === serviceId);
+                        return service ? service.name : 'Unknown Service';
+                      }).join(', ')
+                    : 'No services'}
+                </td>
                 <td>{appointment.userId?.username || 'Unknown'}</td>
                 <td>{appointment.stylist?.username || 'Unknown'}</td>
                 <td>{appointment.locationType}</td>
                 <td>{new Date(appointment.dateTime).toLocaleString()}</td>
                 <td>{appointment.status}</td>
                 <td>
-                  <button onClick={() => handleEditClick(appointment)}>Edit</button>
-                  <button onClick={() => handleDelete(appointment._id)} style={{ marginLeft: '10px' }}>
+                  <button onClick={() => handleEditClick(appointment)} style={{ marginLeft: '10px',
+                      backgroundColor: '#yellow', 
+                      color: 'white',
+                      border: 'none',
+                      padding: '8px 15px',
+                      borderRadius: '5px',
+                      cursor: 'pointer',
+                      fontWeight: 'bold' }}>Edit</button>
+                  <button onClick={() => handleDelete(appointment._id)} style={{ marginLeft: '10px',
+                      backgroundColor: '#FF4D4D', 
+                      color: 'white',
+                      border: 'none',
+                      padding: '8px 15px',
+                      borderRadius: '5px',
+                      cursor: 'pointer',
+                      fontWeight: 'bold' }}>
                     Delete
                   </button>
                 </td>

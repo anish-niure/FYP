@@ -87,7 +87,7 @@ const AdminUserManagement = () => {
   };
 
   const handleResetPassword = async (id) => {
-    const newPassword = prompt('Enter new password:');
+    const newPassword = prompt('En  ter new password:');
     if (!newPassword) return;
     try {
       setLoading(true);

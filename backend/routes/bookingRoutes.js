@@ -167,6 +167,22 @@ router.post('/', authenticate, async (req, res) => {
         });
         await adminNotification.save();
 
+        // Create notification for stylist
+        const stylistNotification = new Notification({
+            userId: stylist, // This is the stylist's user ID
+            message: `${userDetails.username} booked ${serviceNames} with you on ${new Date(dateTime).toLocaleString('en-US', { 
+                month: 'long', 
+                day: 'numeric', 
+                year: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric'
+            })} at ${locationType}.`,
+            date: new Date(),
+            type: 'booking',
+            link: '/stylist/dashboard' // Link to stylist dashboard
+        });
+        await stylistNotification.save();
+
         res.status(201).json({ message: 'Booking created successfully!', booking });
     } catch (err) {
         console.error('Error creating booking:', err);
@@ -190,11 +206,27 @@ router.get('/user', authenticate, async (req, res) => {
 // GET bookings for the logged-in stylist
 router.get('/stylist', authenticate, async (req, res) => {
     try {
+        // Debug info to help diagnose the issue
+        console.log('Fetching bookings for stylist with user ID:', req.user.id);
+        
+        // Find bookings where stylist field matches the current user's ID
         const bookings = await Booking.find({ stylist: req.user.id })
             .populate('userId', 'username email')
+            .populate('services') // Add this to get service names
             .sort({ dateTime: 1 });
+        
+        console.log(`Found ${bookings.length} bookings for this stylist`);
+        
+        // For debugging: If no bookings found, check if there are any in the system
+        if (bookings.length === 0) {
+            const allBookings = await Booking.find();
+            console.log(`Total bookings in system: ${allBookings.length}`);
+            console.log('Sample booking stylist IDs:', allBookings.slice(0, 3).map(b => b.stylist));
+        }
+        
         res.json(bookings);
     } catch (err) {
+        console.error('Error fetching stylist bookings:', err);
         res.status(500).json({ message: 'Server error fetching stylist bookings.' });
     }
 });

@@ -75,25 +75,92 @@ h2 {
   text-align: center;
 }
 
+/* Form field alignment improvements */
 .profile-info {
+  width: 100%;
+  max-width: 500px;
+}
+
+.edit-field {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.edit-field label {
+  text-align: right;
+  font-weight: bold;
+  color: #d4af37;
+}
+
+.edit-field input,
+.edit-field select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #d4af37;
+  background-color: #3a3a3a;
+  color: #d4af37;
+  font-size: 16px;
+}
+
+.edit-field input:disabled,
+.edit-field select:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+/* Profile picture alignment */
+.edit-field.profile-picture-field {
+  grid-template-columns: 1fr;
+  margin-top: 20px;
+}
+
+.edit-field.profile-picture-field label {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Profile picture container and alignment */
+.profile-picture-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
+  margin-bottom: 25px;
   width: 100%;
-  max-width: 500px;
-  padding: 20px;
-  background-color: #2c2c2c;
-  border: 1px solid #d4af37;
-  border-radius: 8px;
 }
 
 .profile-picture {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
+  width: 120px !important;
+  height: 120px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
   border: 3px solid #d4af37;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Make buttons consistent and properly spaced */
+.settings-options {
+  margin-top: 25px;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* For mobile responsiveness */
+@media (max-width: 768px) {
+  .edit-field {
+    grid-template-columns: 1fr;
+  }
+  
+  .edit-field label {
+    text-align: left;
+    margin-bottom: 5px;
+  }
 }
 
 .profile-info p {
@@ -103,12 +170,6 @@ h2 {
 
 .profile-info p strong {
   color: #d4af37;
-}
-
-.settings-options {
-  display: flex;
-  gap: 15px;
-  margin-top: 20px;
 }
 
 .edit-button,
@@ -293,6 +354,15 @@ h2 {
 
 .purchases-section a:hover {
   color: #b8972f;
+}
+
+/* Preview container alignment */
+.preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 15px;
+  width: 100%;
 }
 
 .popup-overlay {

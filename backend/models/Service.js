@@ -5,7 +5,11 @@ const serviceSchema = new mongoose.Schema({
     description: { type: String, required: true },
     priceRange: { type: String, required: true },
     imageUrl: { type: String, required: true },
-    category: { type: String, required: true }, // Add category field
+    category: { 
+        type: String, 
+        required: false, // Change from true to false
+        default: 'general' // Add a default value
+    },
 }, { timestamps: true });
 
 const Service = mongoose.model('Service', serviceSchema);

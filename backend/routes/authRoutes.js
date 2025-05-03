@@ -109,38 +109,52 @@ router.post('/signup', async (req, res) => {
 
 // Login Route (Updated to return user data)
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
   try {
-    // Check if user exists
+    const { email, password } = req.body;
+    
+    // Find user by email (this should work for any role)
     const user = await User.findOne({ email });
     if (!user) {
-      console.log('User not found:', email);
-      return res.status(400).json({ message: 'Invalid credentials.' });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
-
-    // Compare password
+    
+    // Check if user is blocked
+    if (user.isBlocked) {
+      return res.status(403).json({ message: 'Your account has been blocked' });
+    }
+    
+    // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.log('Password mismatch for:', email);
-      return res.status(400).json({ message: 'Invalid credentials.' });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
-
-    // Generate JWT token
-    const userRole = user.role || 'user';
+    
+    // Create token - ensure role is included in payload
     const token = jwt.sign(
-      { id: user._id, role: userRole },
+      { 
+        id: user._id, 
+        role: user.role  // Make sure role is included in the token
+      }, 
       process.env.JWT_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: '7d' }
     );
-
-    console.log('User logged in:', email, 'Role:', userRole);
-    res.status(200).json({
+    
+    // Log the successful login with role information
+    console.log(`User logged in successfully: ${user.email} (${user.role})`);
+    
+    res.json({
       token,
-      user: { id: user._id, username: user.username, email: user.email, role: userRole },
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        profilePicture: user.profilePicture
+      }
     });
-  } catch (err) {
-    console.error('Login error:', err);
-    res.status(500).json({ message: 'Server error during login.', error: err.message });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Server error during login' });
   }
 });
 

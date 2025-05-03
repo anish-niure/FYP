@@ -3,8 +3,9 @@ const router = express.Router();
 const User = require('../models/User');
 const Stylist = require('../models/Stylist');
 const bcrypt = require('bcryptjs');
-const { verifyAdmin } = require('../middleware/authMiddleware');
+const { verifyAdmin, verifyToken, stylistCheck } = require('../middleware/authMiddleware');
 const cloudinary = require('cloudinary').v2;
+const Notification = require('../models/Notification');
 
 // Get all stylists (admin only)
 router.get('/', verifyAdmin, async (req, res) => {
@@ -73,47 +74,57 @@ router.post('/create', verifyAdmin, async (req, res) => {
         imageUrl = result.secure_url;
       } catch (uploadError) {
         console.error('Error uploading to Cloudinary:', uploadError);
-        // Continue creating the stylist even if image upload fails
       }
     }
 
-    // Create new user - explicitly convert to string to avoid null values
+    // Create new user with proper fields to enable login
     const newUser = new User({
-      username: String(username), // Force string conversion
+      username: String(username),
       email: String(email),
       password: hashedPassword,
       role: 'stylist',
+      profilePicture: imageUrl || "",
+      isBlocked: false,
+      createdAt: new Date(),
+      secondaryRole: secondaryRole || '',
+      description: description || ''
     });
     
-    // Log the user object before saving
     console.log('About to save user:', {
       username: newUser.username,
       email: newUser.email,
       role: newUser.role
     });
     
-    await newUser.save();
+    // Save the user first
+    const savedUser = await newUser.save();
+    console.log('User saved successfully with ID:', savedUser._id);
 
-    // Create new stylist
+    // Create new stylist with reference to the user
     const newStylist = new Stylist({
-      username: String(username), // Force string conversion
+      username: String(username),
       email: String(email),
-      userId: newUser._id,
+      userId: savedUser._id,
       imageUrl,
       secondaryRole: secondaryRole || '',
       description: description || ''
     });
     
-    // Log the stylist object before saving
     console.log('About to save stylist:', {
       username: newStylist.username,
       email: newStylist.email,
+      userId: newStylist.userId,
       secondaryRole: newStylist.secondaryRole
     });
     
     await newStylist.save();
+    console.log('Stylist saved successfully');
 
-    res.status(201).json({ message: 'Stylist created successfully' });
+    res.status(201).json({ 
+      message: 'Stylist created successfully',
+      stylistId: newStylist._id,
+      userId: savedUser._id
+    });
   } catch (error) {
     console.error('Error creating stylist:', error);
     res.status(500).json({ message: 'Server error while creating stylist', error: error.message });
@@ -257,6 +268,48 @@ router.get('/public', async (req, res) => {
   } catch (error) {
     console.error('Error fetching public stylists:', error);
     res.status(500).json({ message: 'Failed to fetch stylists.' });
+  }
+});
+
+// Get stylist notifications
+router.get('/notifications', verifyToken, function(req, res, next) {
+  // Inline middleware to replace stylistCheck
+  if (req.user.role !== 'stylist') {
+    return res.status(403).json({ message: 'Access denied. Stylist only.' });
+  }
+  next();
+}, async (req, res) => {
+  try {
+    const notifications = await Notification.find({ 
+      userId: req.user.id 
+    })
+    .sort({ date: -1 })
+    .limit(20);
+    
+    res.json(notifications);
+  } catch (error) {
+    console.error('Error fetching stylist notifications:', error);
+    res.status(500).json({ message: 'Failed to fetch notifications.' });
+  }
+});
+
+// Mark stylist notifications as read
+router.put('/notifications/read', verifyToken, async (req, res) => {
+  try {
+    // Verify the user is a stylist first
+    if (req.user.role !== 'stylist') {
+      return res.status(403).json({ message: 'Access denied. Stylist only.' });
+    }
+    
+    await Notification.updateMany(
+      { userId: req.user.id, read: false },
+      { $set: { read: true } }
+    );
+    
+    res.status(200).json({ message: 'Notifications marked as read' });
+  } catch (error) {
+    console.error('Error marking notifications as read:', error);
+    res.status(500).json({ message: 'Failed to mark notifications as read.' });
   }
 });
 

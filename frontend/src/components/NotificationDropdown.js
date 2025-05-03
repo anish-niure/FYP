@@ -14,6 +14,11 @@ const NotificationDropdown = ({ show, onClose }) => {
   useEffect(() => {
     if (show && user) {
       fetchNotifications();
+      
+      // Mark notifications as read when dropdown is opened
+      if (user) {
+        markNotificationsAsRead();
+      }
     }
   }, [show, user]);
 
@@ -41,7 +46,9 @@ const NotificationDropdown = ({ show, onClose }) => {
       // Different endpoint for admin vs regular users
       const endpoint = user.role === 'admin' 
         ? '/api/admin/notifications'
-        : '/api/store/notifications';
+        : user.role === 'stylist'
+          ? '/api/stylists/notifications'
+          : '/api/store/notifications';
       
       const res = await axios.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` }
@@ -52,6 +59,31 @@ const NotificationDropdown = ({ show, onClose }) => {
       console.error('Failed to fetch notifications:', error);
     } finally {
       setLoading(false);
+    }
+  };
+  
+  const markNotificationsAsRead = async () => {
+    if (!user) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Different endpoint for admin vs regular users
+      const endpoint = user.role === 'admin' 
+        ? '/api/admin/notifications/read'
+        : user.role === 'stylist'
+          ? '/api/stylists/notifications/read'
+          : '/api/store/notifications/read';
+      
+      await axios.put(endpoint, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Dispatch an event to let Navbar know notifications have been read
+      document.dispatchEvent(new CustomEvent('notificationsRead'));
+      
+    } catch (error) {
+      console.error('Failed to mark notifications as read:', error);
     }
   };
   
@@ -81,7 +113,9 @@ const NotificationDropdown = ({ show, onClose }) => {
           notifications.map((notification) => (
             <div 
               key={notification._id} 
-              className={`notification-item ${notification.type ? `notification-${notification.type}` : ''} ${notification.link ? 'clickable' : ''}`}
+              className={`notification-item ${notification.type ? `notification-${notification.type}` : ''} 
+                ${notification.link ? 'clickable' : ''} 
+                ${!notification.read ? 'notification-unread' : ''}`}
               onClick={() => handleNotificationClick(notification)}
             >
               <p>{notification.message}</p>

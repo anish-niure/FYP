@@ -7,49 +7,130 @@
     font-family: 'Arial', sans-serif;
 }
 
+/* Service form styling to match other admin forms */
 .service-form {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 15px;
     max-width: 500px;
-    margin: 0 auto 3rem;
-    padding: 1.5rem;
-    background: rgba(26, 26, 26, 0.9);
-    border-radius: 8px;
-    border: 1px solid #ffd700;
+    margin: 0 auto 40px;
+    padding: 30px;
+    background-color: #1a1a1a;
+    border: 2px solid #d4af37;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(212, 175, 55, 0.2);
+}
+
+.service-form h2 {
+    font-size: 28px;
+    color: #d4af37;
+    border-bottom: 2px solid #d4af37;
+    padding-bottom: 10px;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-input {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.form-input label {
+    text-align: right;
+    font-weight: bold;
+    color: #d4af37;
 }
 
 .service-form input,
 .service-form textarea {
-    padding: 0.75rem;
-    background: #1a1a1a;
-    color: #ffd700;
-    border: 1px solid #ffd700;
+    width: 100%;
+    padding: 10px;
     border-radius: 4px;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
+    border: 1px solid #d4af37;
+    background-color: #3a3a3a;
+    color: #d4af37;
+    font-size: 16px;
 }
 
 .service-form input:focus,
 .service-form textarea:focus {
     outline: none;
-    border-color: #e6c200;
+    border-color: #b8972f;
+    box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
 }
 
-.service-form button {
-    padding: 0.75rem;
-    background: #ffd700;
-    color: #000;
-    border: none;
+.file-input-container {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    align-items: start;
+    gap: 15px;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.file-input-container label {
+    text-align: right;
+    font-weight: bold;
+    color: #d4af37;
+}
+
+.file-input {
+    width: 100%;
+    padding: 10px;
     border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background 0.3s ease, transform 0.2s ease;
+    border: 1px solid #d4af37;
+    background-color: #3a3a3a;
+    color: #d4af37;
 }
 
-.service-form button:hover {
-    background: #e6c200;
-    transform: translateY(-2px);
+.file-input-hint {
+    grid-column: 2;
+    text-align: left;
+    color: #d4af37;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.form-button-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.submit-btn,
+.cancel-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.submit-btn {
+    background-color: #d4af37;
+    color: #1a1a1a;
+    border: 2px solid #d4af37;
+}
+
+.submit-btn:hover {
+    background-color: #b8972f;
+}
+
+.cancel-btn {
+    background-color: #3a3a3a;
+    color: #d4af37;
+    border: 2px solid #d4af37;
+}
+
+.cancel-btn:hover {
+    background-color: #4a4a4a;
 }
 
 .services-list {

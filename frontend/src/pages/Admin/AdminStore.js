@@ -184,8 +184,12 @@ const AdminStore = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="product-form">
+                <h2>Add a Product</h2>
+                
                 <div className="form-input">
+                    <label htmlFor="name">Name:</label>
                     <input
+                        id="name"
                         type="text"
                         name="name"
                         placeholder="Product Name"
@@ -194,17 +198,24 @@ const AdminStore = () => {
                         required
                     />
                 </div>
+                
                 <div className="form-input">
+                    <label htmlFor="description">Description:</label>
                     <textarea
+                        id="description"
                         name="description"
-                        placeholder="Description"
+                        placeholder="Product Description"
                         value={editProduct ? editProduct.description : newProduct.description}
                         onChange={handleChange}
                         required
+                        rows="4"
                     />
                 </div>
+                
                 <div className="form-input">
+                    <label htmlFor="price">Price:</label>
                     <input
+                        id="price"
                         type="number"
                         name="price"
                         placeholder="Price"
@@ -215,21 +226,31 @@ const AdminStore = () => {
                         step="0.01"
                     />
                 </div>
-                <div className="form-input">
-                    <input
-                        type="file"
-                        name="image"
-                        onChange={handleFileChange}
-                    />
+                
+                <div className="file-input-container">
+                    <label htmlFor="image">Product Image:</label>
+                    <div>
+                        <input
+                            id="image"
+                            type="file"
+                            name="image"
+                            onChange={handleFileChange}
+                            className="file-input"
+                        />
+                        <p className="file-input-hint">Image is optional. Only JPEG/PNG files accepted.</p>
+                    </div>
                 </div>
-                <button type="submit" className="submit-btn">
-                    {editProduct ? 'Update Product' : 'Add Product'}
-                </button>
-                {editProduct && (
-                    <button type="button" onClick={() => setEditProduct(null)} className="cancel-btn">
-                        Cancel
+                
+                <div className="form-button-container">
+                    <button type="submit" className="submit-btn">
+                        {editProduct ? 'Update Product' : 'Add Product'}
                     </button>
-                )}
+                    {editProduct && (
+                        <button type="button" onClick={() => setEditProduct(null)} className="cancel-btn">
+                            Cancel
+                        </button>
+                    )}
+                </div>
             </form>
 
             <div className="products-list">

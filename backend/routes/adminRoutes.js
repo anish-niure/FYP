@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const Notification = require('../models/Notification');
 const bcrypt = require('bcrypt');
-const { authenticate, authorize, verifyAdmin } = require('../middleware/authMiddleware');
+const { authenticate, authorize, verifyAdmin, verifyToken, adminCheck } = require('../middleware/authMiddleware');
 
 // Debug route to confirm the base path is working
 router.get('/test', (req, res) => {
@@ -69,6 +69,26 @@ router.get('/notifications', verifyAdmin, async (req, res) => {
     } catch (error) {
         console.error('Error fetching admin notifications:', error);
         res.status(500).json({ message: 'Failed to fetch notifications.' });
+    }
+});
+
+// Mark admin notifications as read
+router.put('/notifications/read', verifyToken, async (req, res) => {
+    try {
+        // Verify the user is an admin first
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Access denied. Admin only.' });
+        }
+        
+        await Notification.updateMany(
+            { role: 'admin', read: false },
+            { $set: { read: true } }
+        );
+        
+        res.status(200).json({ message: 'Notifications marked as read' });
+    } catch (error) {
+        console.error('Error marking notifications as read:', error);
+        res.status(500).json({ message: 'Failed to mark notifications as read.' });
     }
 });
 

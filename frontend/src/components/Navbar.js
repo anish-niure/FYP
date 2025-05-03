@@ -40,13 +40,37 @@ const Navbar = ({ openModal }) => {
     };
   }, []);
 
+  useEffect(() => {
+    const handleNotificationsRead = () => {
+      // Reset notification count when notifications are read
+      setNotificationCount(0);
+    };
+    
+    document.addEventListener('notificationsRead', handleNotificationsRead);
+    
+    return () => {
+      document.removeEventListener('notificationsRead', handleNotificationsRead);
+    };
+  }, []);
+
   const fetchNotificationCount = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('/api/store/notifications', {
+      
+      // Use the correct endpoint based on user role
+      const endpoint = user.role === 'admin' 
+        ? '/api/admin/notifications' 
+        : user.role === 'stylist'
+          ? '/api/stylists/notifications'
+          : '/api/store/notifications';
+      
+      const res = await axios.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setNotificationCount(res.data.length);
+      
+      // Only count unread notifications
+      const unreadCount = res.data.filter(notification => !notification.read).length;
+      setNotificationCount(unreadCount);
     } catch (error) {
       console.error('Failed to fetch notification count:', error);
     }

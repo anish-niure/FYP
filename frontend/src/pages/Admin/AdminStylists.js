@@ -230,56 +230,88 @@ const AdminStylists = () => {
 
       <form onSubmit={handleSubmit} className="create-stylist-form" autoComplete="off">
         <h2>Create New Stylist</h2>
-        <input
-          type="text"
-          placeholder="Full Name (e.g. Alex Doe)"
-          value={formData.username}
-          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-          required
-          disabled={loading}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          required
-          disabled={loading}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          required
-          disabled={loading}
-        />
-        <select
-          value={formData.secondaryRole}
-          onChange={(e) => setFormData({ ...formData, secondaryRole: e.target.value })}
-          disabled={loading}
-          className="role-dropdown"
-        >
-          <option value="Hair Style">Hair Style</option>
-          <option value="Make Up">Make Up</option>
-          <option value="Massage">Massage</option>
-        </select>
-        <textarea
-          placeholder="Stylist description"
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          disabled={loading}
-          className="stylist-description"
-          rows="4"
-        />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          disabled={loading}
-        />
-        <p className="file-hint">Image is optional. Only JPEG/PNG files accepted.</p>
-        <button type="submit" disabled={loading}>
+        
+        <div className="form-group">
+          <label htmlFor="username">Full Name:</label>
+          <input
+            id="username"
+            type="text"
+            value={formData.username}
+            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+            placeholder="Enter full name"
+            required
+            disabled={loading}
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="email">Email:</label>
+          <input
+            id="email"
+            type="email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            placeholder="Enter email address"
+            required
+            disabled={loading}
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="password">Password:</label>
+          <input
+            id="password"
+            type="password"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            placeholder="Create password"
+            required
+            disabled={loading}
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="secondaryRole">Specialty:</label>
+          <select
+            id="secondaryRole"
+            value={formData.secondaryRole}
+            onChange={(e) => setFormData({ ...formData, secondaryRole: e.target.value })}
+            disabled={loading}
+          >
+            <option value="Hair Style">Hair Style</option>
+            <option value="Make Up">Make Up</option>
+            <option value="Massage">Massage</option>
+          </select>
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="description">Description:</label>
+          <textarea
+            id="description"
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            placeholder="Enter stylist's description and experience"
+            disabled={loading}
+            rows="4"
+          />
+        </div>
+        
+        <div className="form-group profile-picture-field">
+          <label className="file-input-label">Profile Picture:</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            disabled={loading}
+            className="file-input"
+          />
+        </div>
+        <div className="form-group" style={{marginTop: '-10px'}}>
+          <label></label> {/* Empty label to maintain grid alignment */}
+          <p className="file-hint">Image is optional. Only JPEG/PNG files accepted.</p>
+        </div>
+        
+        <button type="submit" disabled={loading} className="form-button">
           {loading ? 'Creating...' : 'Create Stylist'}
         </button>
       </form>

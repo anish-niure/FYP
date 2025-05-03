@@ -303,21 +303,21 @@ const Profile = () => {
     <div className="my-profile-section">
       <h2>My Profile {user?.role === 'admin' && '(Admin)'}</h2>
       <div className="profile-info">
-        {user?.profilePicture ? (
-          <img
-            src={user.profilePicture}
-            alt="Profile"
-            className="profile-picture"
-            style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover' }}
-          />
-        ) : (
-          <img
-            src={placeholderImage}
-            alt="Profile"
-            className="profile-picture"
-            style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover' }}
-          />
-        )}
+        <div className="profile-picture-container">
+          {user?.profilePicture ? (
+            <img
+              src={user.profilePicture}
+              alt="Profile"
+              className="profile-picture"
+            />
+          ) : (
+            <img
+              src={placeholderImage}
+              alt="Profile"
+              className="profile-picture"
+            />
+          )}
+        </div>
         <div className="edit-field">
           <label>Username:</label>
           <input
@@ -372,7 +372,7 @@ const Profile = () => {
           />
         </div>
         {isEditing && (
-          <div className="edit-field">
+          <div className="edit-field profile-picture-field">
             <label>Profile Picture:</label>
             <input
               type="file"
@@ -391,8 +391,7 @@ const Profile = () => {
                     ? profilePicture 
                     : URL.createObjectURL(profilePicture)}
                   alt="Profile Preview"
-                  className="profile-picture-preview"
-                  style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', marginTop: '10px' }}
+                  className="profile-picture"
                 />
                 <p className="preview-text">Preview</p>
               </div>
@@ -413,23 +412,25 @@ const Profile = () => {
             </select>
           </div>
         )}
-        {isEditing ? (
-          <>
-            <button onClick={handleSaveProfileClick} className="save-button">
-              Save Changes
+        <div className="settings-options">
+          {isEditing ? (
+            <>
+              <button onClick={handleSaveProfileClick} className="save-button">
+                Save Changes
+              </button>
+              <button onClick={handleCancelClick} className="cancel-button">
+                Cancel
+              </button>
+            </>
+          ) : (
+            <button onClick={() => setIsEditing(true)} className="edit-button">
+              Edit Profile
             </button>
-            <button onClick={handleCancelClick} className="cancel-button">
-              Cancel
-            </button>
-          </>
-        ) : (
-          <button onClick={() => setIsEditing(true)} className="edit-button">
-            Edit Profile
+          )}
+          <button onClick={handleResetPasswordClick} className="reset-password-button">
+            Reset Password
           </button>
-        )}
-        <button onClick={handleResetPasswordClick} className="reset-password-button">
-          Reset Password
-        </button>
+        </div>
       </div>
       {error && (
         <p className={error.includes('successful') ? 'success-message' : 'error-text'}>

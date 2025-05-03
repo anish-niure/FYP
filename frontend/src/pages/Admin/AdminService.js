@@ -149,8 +149,12 @@ const AdminService = () => {
             <h1>Manage Services</h1>
             {error && <div className="error-message">{error}</div>}
             <form onSubmit={handleSubmit} className="service-form">
+                <h2>Add a Service</h2>
+                
                 <div className="form-input">
+                    <label htmlFor="serviceName">Name:</label>
                     <input
+                        id="serviceName"
                         type="text"
                         name="name"
                         placeholder="Service Name"
@@ -159,17 +163,24 @@ const AdminService = () => {
                         required
                     />
                 </div>
+                
                 <div className="form-input">
+                    <label htmlFor="serviceDescription">Description:</label>
                     <textarea
+                        id="serviceDescription"
                         name="description"
                         placeholder="Description"
                         value={editService ? editService.description : newService.description}
                         onChange={handleChange}
                         required
+                        rows="4"
                     />
                 </div>
+                
                 <div className="form-input">
+                    <label htmlFor="servicePriceRange">Price Range:</label>
                     <input
+                        id="servicePriceRange"
                         type="text"
                         name="priceRange"
                         placeholder="Price Range (e.g., Starting from $50)"
@@ -178,25 +189,35 @@ const AdminService = () => {
                         required
                     />
                 </div>
-                <div className="form-input">
-                    <input
-                        type="file"
-                        name="image"
-                        onChange={handleFileChange}
-                    />
+                
+                <div className="file-input-container">
+                    <label htmlFor="serviceImage">Image:</label>
+                    <div>
+                        <input
+                            id="serviceImage"
+                            type="file"
+                            name="image"
+                            onChange={handleFileChange}
+                            className="file-input"
+                        />
+                        <p className="file-input-hint">Image is optional. Only JPEG/PNG files accepted.</p>
+                    </div>
                 </div>
-                <button type="submit" className="submit-btn">
-                    {editService ? 'Update Service' : 'Add Service'}
-                </button>
-                {editService && (
-                    <button
-                        type="button"
-                        onClick={() => setEditService(null)}
-                        className="cancel-btn"
-                    >
-                        Cancel
+                
+                <div className="form-button-container">
+                    <button type="submit" className="submit-btn">
+                        {editService ? 'Update Service' : 'Add Service'}
                     </button>
-                )}
+                    {editService && (
+                        <button
+                            type="button"
+                            onClick={() => setEditService(null)}
+                            className="cancel-btn"
+                        >
+                            Cancel
+                        </button>
+                    )}
+                </div>
             </form>
 
             <div className="services-list">
