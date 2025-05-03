@@ -4,8 +4,9 @@ const Booking = require('../models/Booking');
 const Service = require('../models/Service');
 const User = require('../models/User');
 const Notification = require('../models/Notification'); // Import the Notification model
-const { authenticate } = require('../middleware/authMiddleware');
+const { authenticate, verifyAdmin } = require('../middleware/authMiddleware');
 const { sendEmail, createBookingConfirmationHTML } = require('../utils/emailService');
+
 
 // Salon hours
 const salonHours = {
@@ -336,6 +337,76 @@ router.put('/:id', authenticate, async (req, res) => {
     } catch (err) {
         console.error('Error updating booking:', err);
         res.status(500).json({ message: 'Failed to update booking.' });
+    }
+});
+
+// UPDATE appointment status (admin only)
+router.put('/:id/status', verifyAdmin, async (req, res) => {
+    try {
+        const { status } = req.body;
+        if (!status) {
+            return res.status(400).json({ message: 'Status is required' });
+        }
+
+        // Update appointment status and populate user details for email
+        const booking = await Booking.findByIdAndUpdate(
+            req.params.id,
+            { status },
+            { new: true }
+        ).populate('userId', 'username email');
+
+        if (!booking) {
+            return res.status(404).json({ message: 'Appointment not found' });
+        }
+
+        // Debug log to verify that user details are available
+        console.log('Updated booking:', {
+            status: booking.status,
+            userId: booking.userId ? booking.userId._id : null,
+            userEmail: booking.userId ? booking.userId.email : null
+        });
+
+        // If the status changes to Confirmed or Canceled, send an email notification to the user
+        if (['Confirmed', 'Canceled'].includes(status)) {
+            const subject = `Appointment Update - Your Appointment is now ${booking.status}`;
+            const htmlContent = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;
+                            border: 1px solid #d4af37; border-radius: 10px;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h1 style="color: #d4af37;">The Moon Salon</h1>
+                    </div>
+                    <p>Hello ${booking.userId.username},</p>
+                    <p>Your appointment scheduled on 
+                       ${new Date(booking.dateTime).toLocaleString('en-US', {
+                           weekday: 'long',
+                           month: 'long',
+                           day: 'numeric',
+                           year: 'numeric',
+                           hour: '2-digit',
+                           minute: '2-digit'
+                       })}
+                       has been updated to <strong>${booking.status}</strong>.
+                    </p>
+                    <p>If you have any questions, please contact our support.</p>
+                </div>
+            `;
+            console.log('Sending email to:', booking.userId.email);
+            try {
+                const emailSuccess = await sendEmail(booking.userId.email, subject, htmlContent);
+                if (emailSuccess) {
+                    console.log(`Appointment status update email sent successfully to ${booking.userId.email}`);
+                } else {
+                    console.error(`Failed to send appointment status update email to ${booking.userId.email}`);
+                }
+            } catch (emailError) {
+                console.error('Error sending appointment update email:', emailError);
+            }
+        }
+
+        res.json({ message: 'Appointment status updated successfully', booking });
+    } catch (error) {
+        console.error('Error updating appointment status:', error);
+        res.status(500).json({ message: 'Server error while updating appointment status' });
     }
 });
 
