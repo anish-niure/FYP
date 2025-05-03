@@ -178,7 +178,8 @@ router.post('/', authenticate, async (req, res) => {
 router.get('/user', authenticate, async (req, res) => {
     try {
         const bookings = await Booking.find({ userId: req.user.id })
-            .populate('stylist', 'username email')
+            .populate('services') // Populate services details
+            .populate('stylist', 'username email profilePicture') // Populate stylist details
             .sort({ dateTime: 1 });
         res.json(bookings);
     } catch (err) {

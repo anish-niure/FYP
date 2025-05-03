@@ -478,7 +478,7 @@ const Profile = () => {
               <table>
                 <thead>
                   <tr>
-                    <th>Service</th>
+                    <th>Service(s)</th>
                     <th>Stylist</th>
                     <th>Date/Time</th>
                     <th>Location</th>
@@ -488,8 +488,26 @@ const Profile = () => {
                 <tbody>
                   {bookings.map((booking) => (
                     <tr key={booking._id}>
-                      <td>{booking.service}</td>
-                      <td>{booking.stylist?.username || 'N/A'}</td>
+                      <td>
+                        {Array.isArray(booking.services) && booking.services.length > 0 
+                          ? booking.services.map(service => {
+                              // Handle both object with name and string ID cases
+                              if (typeof service === 'object' && service !== null) {
+                                return service.name || 'Unknown Service';
+                              }
+                              return 'Unknown Service';
+                            }).join(', ')
+                          : 'N/A'
+                        }
+                      </td>
+                      <td>
+                        {booking.stylist 
+                          ? (typeof booking.stylist === 'object' && booking.stylist !== null
+                              ? (booking.stylist.username || 'Unknown Stylist')
+                              : 'Unknown Stylist')
+                          : 'N/A'
+                        }
+                      </td>
                       <td>{new Date(booking.dateTime).toLocaleString()}</td>
                       <td>{booking.locationType}</td>
                       <td>{booking.status}</td>
