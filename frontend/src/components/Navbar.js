@@ -1,5 +1,6 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
 import '../styles/Navbar.css';
 import menuIcon from '../assets/icons/menu.png';
 import cartIcon from '../assets/icons/shopping-cart.png';
@@ -7,11 +8,32 @@ import userIcon from '../assets/icons/user.png';
 import notificationIcon from '../assets/icons/notification.png';
 import moonLogo from '../assets/icons/moon.svg';
 import { AuthContext } from '../context/AuthContext';
+import NotificationDropdown from './NotificationDropdown';
 
 const Navbar = ({ openModal }) => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [showLogout, setShowLogout] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  useEffect(() => {
+    if (user) {
+      fetchNotificationCount();
+    }
+  }, [user]);
+
+  const fetchNotificationCount = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get('/api/store/notifications', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNotificationCount(res.data.length);
+    } catch (error) {
+      console.error('Failed to fetch notification count:', error);
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -27,7 +49,7 @@ const Navbar = ({ openModal }) => {
   };
 
   const handleNotificationClick = () => {
-    console.log('Notification clicked');
+    setShowNotifications(!showNotifications);
   };
 
   const handleBookAppointmentClick = (e) => {
@@ -65,7 +87,6 @@ const Navbar = ({ openModal }) => {
         </div>
       </div>
 
-      {/* Rest of the code remains the same */}
       <div className="nav-center">
         <img
           src={moonLogo}
@@ -95,9 +116,17 @@ const Navbar = ({ openModal }) => {
           )}
         </div>
         {user && (
-          <div className="icon-link" onClick={handleNotificationClick} style={{ cursor: 'pointer' }}>
+          <div className="icon-link" onClick={handleNotificationClick} style={{ cursor: 'pointer', position: 'relative' }}>
             <img src={notificationIcon} alt="Notification Icon" className="nav-icon" />
-            <span className="notification-badge">3</span>
+            {notificationCount > 0 && (
+              <span className="notification-badge">{notificationCount}</span>
+            )}
+            {showNotifications && (
+              <NotificationDropdown 
+                show={showNotifications} 
+                onClose={() => setShowNotifications(false)} 
+              />
+            )}
           </div>
         )}
       </div>

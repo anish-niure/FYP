@@ -5,6 +5,7 @@ const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const cloudinary = require('cloudinary').v2;
 const connectDB = require('./config/db');
+const storeRoutes = require('./routes/storeRoutes');
 
 const app = express();
 dotenv.config();
@@ -62,6 +63,7 @@ app.use('/api/stylists', stylistRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/store', storeRoutes);
 
 // Debug middleware to log incoming requests
 app.use((req, res, next) => {

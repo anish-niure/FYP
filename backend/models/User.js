@@ -58,4 +58,17 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+// Virtual field for username (derived from firstName and lastName)
+userSchema.virtual('username').get(function () {
+  return `${this.firstName} ${this.lastName}`.trim();
+}).set(function (value) {
+  const [firstName, ...lastNameParts] = value.split(' ');
+  this.firstName = firstName;
+  this.lastName = lastNameParts.join(' ') || '';
+});
+
+// Ensure virtuals are included in toJSON and toObject
+userSchema.set('toJSON', { virtuals: true });
+userSchema.set('toObject', { virtuals: true });
+
 module.exports = mongoose.model('User', userSchema);
