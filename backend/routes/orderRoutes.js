@@ -44,6 +44,7 @@ router.put('/:id/status', verifyAdmin, async (req, res) => {
             return res.status(400).json({ message: 'Status is required' });
         }
 
+        // Update order status and populate user info for email
         const order = await Purchase.findByIdAndUpdate(
             req.params.id,
             { status },
@@ -52,6 +53,34 @@ router.put('/:id/status', verifyAdmin, async (req, res) => {
 
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
+        }
+
+        // If the status was changed from "Pending" to "Shipped" or "Cancelled",
+        // send an email notification to the user
+        if (['Shipped', 'Cancelled'].includes(status)) {
+            const { sendEmail } = require('../utils/emailService');
+            const subject = `Order Update - Your Order is now ${order.status}`;
+            const htmlContent = `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #d4af37; border-radius: 10px;">
+                  <div style="text-align: center; margin-bottom: 20px;">
+                    <h1 style="color: #d4af37;">The Moon Salon</h1>
+                  </div>
+                  <p>Hello ${order.userId.username},</p>
+                  <p>Your order for <strong>${order.productName}</strong> (x${order.quantity}) has been updated to <strong>${order.status}</strong>.</p>
+                  <p>If you have any questions, please contact our support.</p>
+                </div>
+            `;
+            
+            // Send the notification email (ignore failure to send so admin updates still succeed)
+            sendEmail(order.userId.email, subject, htmlContent)
+                .then(success => {
+                    if (success) {
+                        console.log(`Order status update email sent successfully to ${order.userId.email}`);
+                    } else {
+                        console.error(`Failed to send order status update email to ${order.userId.email}`);
+                    }
+                })
+                .catch(err => console.error('Error sending order status update email:', err));
         }
 
         res.json({ message: 'Order status updated successfully', order });

@@ -6,6 +6,7 @@ const Cart = require('../models/Cart');
 const Notification = require('../models/Notification');
 const User = require('../models/User'); // Added User model
 const { verifyToken } = require('../middleware/authMiddleware');
+const { sendEmail, createOrderConfirmationHTML } = require('../utils/emailService');
 
 // Get all products
 router.get('/products', async (req, res) => {
@@ -105,8 +106,11 @@ router.post('/checkout', verifyToken, async (req, res) => {
       return res.status(400).json({ message: 'Your cart is empty.' });
     }
 
-    // Create purchase records for each item
     const purchases = [];
+    const userDetails = await User.findById(userId);
+    // Fetch admin user once
+    const adminUser = await User.findOne({ role: 'admin' });
+
     for (const item of cart.items) {
       const purchase = new Purchase({
         userId,
@@ -129,15 +133,55 @@ router.post('/checkout', verifyToken, async (req, res) => {
       await userNotification.save();
       
       // Create notification for admin
-      const user = await User.findById(userId);
       const adminNotification = new Notification({
         role: 'admin',
-        message: `${user.username} purchased ${item.productName} (x${item.quantity}) for $${(item.price * item.quantity).toFixed(2)}.`,
+        message: `${userDetails.username} purchased ${item.productName} (x${item.quantity}) for $${(item.price * item.quantity).toFixed(2)}.`,
         date: new Date(),
         type: 'order',
         link: '/admin/orders'
       });
       await adminNotification.save();
+      
+      // Prepare email details for order confirmation
+      const orderDetails = {
+        productName: item.productName,
+        quantity: item.quantity,
+        pricePerUnit: item.price,
+        totalPrice: item.price * item.quantity,
+        purchaseDate: new Date()
+      };
+
+      try {
+        let emailsSent = 0;
+        let totalEmailsToSend = 0;
+        
+        // Send email to user
+        if (userDetails && userDetails.email) {
+          totalEmailsToSend++;
+          const userEmailContent = createOrderConfirmationHTML(orderDetails, 'user');
+          const userEmailSent = await sendEmail(userDetails.email, userEmailContent.subject, userEmailContent.html);
+          if (userEmailSent) emailsSent++;
+        }
+        
+        // Send email to admin
+        if (adminUser && adminUser.email) {
+          totalEmailsToSend++;
+          const adminEmailContent = createOrderConfirmationHTML(orderDetails, 'admin');
+          const adminEmailSent = await sendEmail(adminUser.email, adminEmailContent.subject, adminEmailContent.html);
+          if (adminEmailSent) emailsSent++;
+        }
+        
+        if (emailsSent === totalEmailsToSend && totalEmailsToSend > 0) {
+          console.log(`All order confirmation emails sent successfully (${emailsSent} of ${totalEmailsToSend})`);
+        } else if (emailsSent > 0) {
+          console.log(`Some order confirmation emails sent (${emailsSent} of ${totalEmailsToSend})`);
+        } else {
+          console.log('No order confirmation emails were sent');
+        }
+      } catch (emailError) {
+        console.error('Error sending order confirmation emails:', emailError);
+        // continue even if email fails
+      }
     }
 
     // Clear the cart

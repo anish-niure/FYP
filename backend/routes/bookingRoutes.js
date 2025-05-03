@@ -5,6 +5,7 @@ const Service = require('../models/Service');
 const User = require('../models/User');
 const Notification = require('../models/Notification'); // Import the Notification model
 const { authenticate } = require('../middleware/authMiddleware');
+const { sendEmail, createBookingConfirmationHTML } = require('../utils/emailService');
 
 // Salon hours
 const salonHours = {
@@ -127,7 +128,7 @@ router.post('/', authenticate, async (req, res) => {
         });
         await booking.save();
 
-        // Get details for notifications
+        // Get details for notifications and emails
         const serviceDetails = await Promise.all(
             services.map(serviceId => Service.findById(serviceId))
         );
@@ -135,8 +136,8 @@ router.post('/', authenticate, async (req, res) => {
         const serviceNames = serviceDetails.map(service => service.name).join(', ');
         const stylistDetails = await User.findById(stylist);
         const userDetails = await User.findById(req.user.id);
-
-        // Create notification for user
+        
+        // Create notifications
         const userNotification = new Notification({
             userId: req.user.id,
             message: `You booked ${serviceNames} with ${stylistDetails.username} on ${new Date(dateTime).toLocaleString('en-US', { 
@@ -151,7 +152,6 @@ router.post('/', authenticate, async (req, res) => {
         });
         await userNotification.save();
         
-        // Create notification for admin
         const adminNotification = new Notification({
             role: 'admin',
             message: `${userDetails.username} booked ${serviceNames} with ${stylistDetails.username} on ${new Date(dateTime).toLocaleString('en-US', { 
@@ -167,9 +167,8 @@ router.post('/', authenticate, async (req, res) => {
         });
         await adminNotification.save();
 
-        // Create notification for stylist
         const stylistNotification = new Notification({
-            userId: stylist, // This is the stylist's user ID
+            userId: stylist,
             message: `${userDetails.username} booked ${serviceNames} with you on ${new Date(dateTime).toLocaleString('en-US', { 
                 month: 'long', 
                 day: 'numeric', 
@@ -179,9 +178,62 @@ router.post('/', authenticate, async (req, res) => {
             })} at ${locationType}.`,
             date: new Date(),
             type: 'booking',
-            link: '/stylist/dashboard' // Link to stylist dashboard
+            link: '/stylist/dashboard'
         });
         await stylistNotification.save();
+
+        // Find admin email
+        const adminUser = await User.findOne({ role: 'admin' });
+        if (!adminUser) {
+            console.error('Admin user not found for email notification');
+        }
+
+        // Prepare email content
+        const emailDetails = {
+            serviceNames,
+            dateTime,
+            locationType,
+            userName: userDetails.username,
+            stylistName: stylistDetails.username
+        };
+
+        // Send emails to all parties
+        try {
+            let emailsSent = 0;
+            let totalEmailsToSend = 0;
+            
+            if (userDetails && userDetails.email) {
+                totalEmailsToSend++;
+                const userEmailContent = createBookingConfirmationHTML(emailDetails, 'user');
+                const userEmailSent = await sendEmail(userDetails.email, userEmailContent.subject, userEmailContent.html);
+                if (userEmailSent) emailsSent++;
+            }
+            
+            if (stylistDetails && stylistDetails.email) {
+                totalEmailsToSend++;
+                const stylistEmailContent = createBookingConfirmationHTML(emailDetails, 'stylist');
+                const stylistEmailSent = await sendEmail(stylistDetails.email, stylistEmailContent.subject, stylistEmailContent.html);
+                if (stylistEmailSent) emailsSent++;
+            }
+            
+            if (adminUser && adminUser.email) {
+                totalEmailsToSend++;
+                const adminEmailContent = createBookingConfirmationHTML(emailDetails, 'admin');
+                const adminEmailSent = await sendEmail(adminUser.email, adminEmailContent.subject, adminEmailContent.html);
+                if (adminEmailSent) emailsSent++;
+            }
+            
+            if (emailsSent === totalEmailsToSend && totalEmailsToSend > 0) {
+                console.log(`All booking confirmation emails sent successfully (${emailsSent} of ${totalEmailsToSend})`);
+            } else if (emailsSent > 0) {
+                console.log(`Some booking confirmation emails sent (${emailsSent} of ${totalEmailsToSend})`);
+            } else {
+                console.log('No booking confirmation emails were sent');
+            }
+        } catch (emailError) {
+            console.error('Error sending confirmation emails:', emailError);
+            // Continue with response even if emails fail
+        }
 
         res.status(201).json({ message: 'Booking created successfully!', booking });
     } catch (err) {

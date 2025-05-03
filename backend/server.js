@@ -11,6 +11,15 @@ const fs = require('fs');
 const orderRoutes = require('./routes/orderRoutes');
 const adminRoutes = require('./routes/adminRoutes'); // Added adminRoutes require statement
 
+// Ensure this is near the top of your file, before any code tries to access env variables
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+
+// Check if critical env variables are loaded (add this after dotenv config)
+console.log('Email credentials loaded:', {
+  username: process.env.EMAIL_USERNAME ? '✅ Present' : '❌ Missing',
+  password: process.env.EMAIL_PASSWORD ? '✅ Present' : '❌ Missing',
+});
+
 const app = express();
 dotenv.config();
 
