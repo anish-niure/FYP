@@ -17,30 +17,28 @@ const Modal = ({ isOpen, closeModal }) => {
     setErrorMessage('');
     setIsLoading(true);
 
+    const formDataObj = new FormData(e.target);
+    const payload = {
+      // Concatenate first and last name to form the username
+      username: `${formDataObj.get('firstName') || ''} ${formDataObj.get('lastName') || ''}`.trim(),
+      email: formDataObj.get('email'),
+      password: formDataObj.get('password'),
+      phoneNumber: formDataObj.get('phoneNumber'),
+      gender: formDataObj.get('gender'),
+      location: formDataObj.get('location'),
+    };
+
+    // For login, remove extra fields (if needed)
+    if (isLogin) {
+      delete payload.username;
+      delete payload.phoneNumber;
+      delete payload.gender;
+      delete payload.location;
+    }
+
     const endpoint = isLogin
       ? 'http://localhost:5001/api/auth/login'
       : 'http://localhost:5001/api/auth/signup';
-
-    const formData = new FormData(e.target);
-    const payload = {
-      firstName: formData.get('firstName'),
-      lastName: formData.get('lastName'),
-      email: formData.get('email'),
-      password: formData.get('password'),
-      phoneNumber: formData.get('phoneNumber'),
-      gender: formData.get('gender'),
-      confirmPassword: formData.get('confirmPassword'),
-      location: formData.get('location'),
-    };
-
-    if (isLogin) {
-      delete payload.firstName;
-      delete payload.lastName;
-      delete payload.phoneNumber;
-      delete payload.gender;
-      delete payload.confirmPassword;
-      delete payload.location;
-    }
 
     try {
       const response = await fetch(endpoint, {

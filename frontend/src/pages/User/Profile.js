@@ -161,6 +161,7 @@ const Profile = () => {
       return;
     }
 
+    // Validation
     if (username && username.length < 3) {
       setError('Username must be at least 3 characters long.');
       return;
@@ -181,63 +182,70 @@ const Profile = () => {
       return;
     }
 
-    if (username.trim()) formData.append('username', username.trim());
-    if (phoneNumber.trim()) formData.append('phoneNumber', phoneNumber.trim());
-    if (email.trim()) formData.append('email', email.trim());
-    if (gender) formData.append('gender', gender);
-    if (userLocation.trim()) formData.append('location', userLocation.trim());
-    if (profilePicture) {
+    // Always include all fields in the form data to ensure updates work consistently
+    formData.append('username', username.trim());
+    formData.append('phoneNumber', phoneNumber.trim());
+    formData.append('email', email.trim());
+    formData.append('gender', gender);
+    formData.append('location', userLocation.trim());
+    
+    if (profilePicture && profilePicture instanceof File) {
       formData.append('profilePicture', profilePicture);
     }
-
-    if (user?.role === 'admin' && adminLevel) {
-      formData.append('adminLevel', adminLevel);
-    }
-
+    
     try {
+      setError('Updating your profile...');
+      
+      // Use a different approach - explicitly set the Content-Type header
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      };
+
       const response = await axios.post(
         'http://localhost:5001/api/user/update',
         formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        }
+        config
       );
 
-      const updatedUser = response.data;
-      setUser(updatedUser);
-      setUsername(updatedUser.username || '');
-      setPhoneNumber(updatedUser.phoneNumber || '');
-      setEmail(updatedUser.email || '');
-      setGender(updatedUser.gender || '');
-      setUserLocation(updatedUser.location || '');
-
-      if (updatedUser.adminLevel) {
-        setAdminLevel(updatedUser.adminLevel);
-      }
-
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      setIsEditing(false);
+      // Log the successful response
+      console.log('Profile update successful:', response.data);
+      
+      // Create a temporary success variable before updating state
+      const updateSuccess = true;
+      
+      // Update profile data one by one to avoid state inconsistency
+      setUser(prev => ({...prev, ...response.data}));
+      setUsername(response.data.username || '');
+      setPhoneNumber(response.data.phoneNumber || '');
+      setEmail(response.data.email || '');
+      setGender(response.data.gender || '');
+      setUserLocation(response.data.location || '');
+      
+      // Update local storage
+      const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+      localStorage.setItem('user', JSON.stringify({
+        ...storedUser,
+        ...response.data
+      }));
+      
+      // Exit editing mode and show success message
       setProfilePicture(null);
-
-      const successElement = document.createElement('div');
-      successElement.className = 'success-message-popup';
-      successElement.textContent = 'Profile updated successfully!';
-      document.body.appendChild(successElement);
-
-      setTimeout(() => {
-        if (document.querySelector('.success-message-popup')) {
-          document.body.removeChild(document.querySelector('.success-message-popup'));
-        }
-
-        refreshAllUserData();
-      }, 2000);
+      setIsEditing(false);
+      
+      if (updateSuccess) {
+        setError('Profile updated successfully!');
+        setTimeout(() => {
+          if (error === 'Profile updated successfully!') {
+            setError('');
+          }
+        }, 3000);
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
       setError(`Failed to update profile: ${error.response?.data?.message || error.message}`);
-      setIsEditing(true);
     }
   };
 
@@ -324,7 +332,7 @@ const Profile = () => {
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter your username"
+            placeholder="Enter your full name"
             disabled={!isEditing}
           />
         </div>

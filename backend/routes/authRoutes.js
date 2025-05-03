@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const sgMail = require('@sendgrid/mail');
 const crypto = require('crypto');
 const User = require('../models/User');
+const Stylist = require('../models/Stylist');
 const { authenticate } = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -35,75 +36,73 @@ router.post('/test-email', async (req, res) => {
 
 // Signup Route (for regular users)
 router.post('/signup', async (req, res) => {
-  const { firstName, lastName, email, password, phoneNumber, gender, confirmPassword, location } = req.body;
-
-  // Combine firstName and lastName into username for backward compatibility
-  const username = `${firstName} ${lastName}`;
-
   try {
-    // Validate phone number
-    if (!/^[0-9]{10}$/.test(phoneNumber)) {
-      return res.status(400).json({ message: 'Phone number must be 10 digits long.' });
-    }
+    let { username, email, password, gender, phoneNumber, location } = req.body;
+    
+    // Trim and normalize username and email
+    username = username.trim();
+    email = email.trim().toLowerCase();
 
-    // Validate gender
-    if (!['Male', 'Female', 'Other'].includes(gender)) {
-      return res.status(400).json({ message: 'Invalid gender option selected.' });
-    }
-
-    // Validate password confirmation
-    if (password !== confirmPassword) {
-      return res.status(400).json({ message: 'Passwords do not match.' });
-    }
-
-    // Validate password strength
-    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{5,}$/;
-    if (!passwordRegex.test(password)) {
+    // Check if user already exists in User collection (case-insensitive)
+    const existingUser = await User.findOne({
+      $or: [
+        { email: new RegExp(`^${email}$`, 'i') },
+        { username: new RegExp(`^${username}$`, 'i') }
+      ]
+    });
+    if (existingUser) {
       return res.status(400).json({
-        message: 'Password must be at least 5 characters long, contain at least one number, and one special character (!, @, #, $, etc.).',
+        message: existingUser.email.toLowerCase() === email ? 'Email already in use.' : 'Username already taken.'
       });
     }
-
-    // Check if user already exists
-    const user = await User.findOne({ email });
-    if (user) {
-      console.log('User already exists:', email);
-      return res.status(400).json({ message: 'User already exists.' });
-    }
-
-    // Create new user with additional fields
-    const newUser = new User({ firstName, lastName, username, email, password, phoneNumber, gender, location, role: 'user' });
-    const salt = await bcrypt.genSalt(10);
-    newUser.password = await bcrypt.hash(password, salt);
-    await newUser.save();
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: newUser._id, role: newUser.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-
-    // Send welcome email
-    const msg = {
-      to: email,
-      from: 'niureanish@gmail.com',
-      subject: 'Welcome to Moon Beauty Salon',
-      text: `Hi ${username},\n\nWelcome to Moon Beauty Salon! We're excited to have you on board.`,
-      html: `<p>Hi ${username},</p><p>Welcome to Moon Beauty Salon! We're excited to have you on board.</p>`,
-    };
-
-    const result = await sgMail.send(msg);
-    console.log('Welcome email sent to:', email, result);
-
-    res.status(201).json({
-      token,
-      user: { id: newUser._id, username, email, role: newUser.role },
+    
+    // Also check Stylist collection for duplicates (case-insensitive)
+    const existingStylist = await Stylist.findOne({
+      $or: [
+        { email: new RegExp(`^${email}$`, 'i') },
+        { username: new RegExp(`^${username}$`, 'i') }
+      ]
     });
-  } catch (err) {
-    console.error('Signup error:', err);
-    if (err.response) console.error('SendGrid response:', err.response.body);
-    res.status(500).json({ message: 'Server error during signup.', error: err.message });
+    if (existingStylist) {
+      return res.status(400).json({
+        message: existingStylist.email.toLowerCase() === email ? 'Email already in use.' : 'Username already taken.'
+      });
+    }
+    
+    // Create new user with gender value converted to lowercase
+    const newUser = new User({
+      username,
+      email,
+      password, // Password will be hashed by the pre-save hook
+      gender: gender ? gender.toLowerCase() : '',
+      phoneNumber,
+      location
+    });
+    
+    await newUser.save();
+    
+    // Generate token
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+      expiresIn: '30d'
+    });
+    
+    // Return success response with token and user info
+    res.status(201).json({
+      message: 'User registered successfully',
+      token,
+      user: {
+        id: newUser._id,
+        username: newUser.username,
+        email: newUser.email,
+        role: newUser.role,
+        gender: newUser.gender,
+        phoneNumber: newUser.phoneNumber,
+        location: newUser.location
+      }
+    });
+  } catch (error) {
+    console.warn('Signup error:', error);
+    res.status(500).json({ message: 'Error registering new user', error: error.message });
   }
 });
 

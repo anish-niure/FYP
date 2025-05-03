@@ -8,6 +8,11 @@ const Notification = require('../models/Notification');
 const Stylist = require('../models/Stylist');
 const path = require('path');
 
+// Add this near the top of your file
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 // Configure multer with disk storage and file limits
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -63,28 +68,22 @@ router.post('/update', authenticate, async (req, res) => {
     console.log('Incoming request body:', req.body);
     console.log('Incoming files:', req.files);
 
-    const { username, phoneNumber, gender, location, email, adminLevel } = req.body;
+    const { username, phoneNumber, gender, location, email } = req.body;
     const userId = req.user.id;
     
-    // Get the current user to check role
+    // Get the current user
     const currentUser = await User.findById(userId);
     if (!currentUser) {
       return res.status(404).json({ message: 'User not found.' });
     }
 
-    // Validate input fields
-    if (!username && !phoneNumber && !gender && !location && !email && !req.files && 
-        !(currentUser.role === 'admin' && adminLevel)) {
-      return res.status(400).json({ message: 'No valid fields provided for update.' });
-    }
-
-    // Prepare updates
+    // Prepare updates - explicitly set each field
     const updates = {};
-    if (username) updates.username = username;
-    if (phoneNumber) updates.phoneNumber = phoneNumber;
-    if (gender) updates.gender = gender.toLowerCase(); // Convert to lowercase to match schema enum
-    if (location) updates.location = location;
-    if (email) {
+    if (username !== undefined) updates.username = username;
+    if (phoneNumber !== undefined) updates.phoneNumber = phoneNumber;
+    if (gender !== undefined) updates.gender = gender.toLowerCase();
+    if (location !== undefined) updates.location = location;
+    if (email !== undefined && email !== currentUser.email) {
       // Check for email uniqueness
       const existingUser = await User.findOne({ email, _id: { $ne: userId } });
       if (existingUser) {
@@ -93,12 +92,7 @@ router.post('/update', authenticate, async (req, res) => {
       updates.email = email;
     }
     
-    // Handle admin-specific fields
-    if (currentUser.role === 'admin' && adminLevel) {
-      updates.adminLevel = adminLevel;
-    }
-
-    // Handle image upload to Cloudinary
+    // Handle image upload
     if (req.files && req.files.profilePicture) {
       try {
         const file = req.files.profilePicture;
@@ -107,34 +101,42 @@ router.post('/update', authenticate, async (req, res) => {
         });
         updates.profilePicture = result.secure_url;
       } catch (cloudinaryError) {
-        console.error('Cloudinary upload error:', cloudinaryError);
-        return res.status(500).json({ message: 'Failed to upload image to Cloudinary.', details: cloudinaryError.message });
+        console.error('Cloudinary error:', cloudinaryError);
+        return res.status(500).json({ message: 'Failed to upload profile picture.' });
       }
     }
 
-    console.log('Prepared updates:', updates);
-
-    // Update the user in MongoDB
+    console.log('Applying updates:', updates);
+    
+    // Update user document
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { $set: updates },
       { new: true, runValidators: true }
-    ).lean({ virtuals: true });
-
-    if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found.' });
-    }
+    );
 
     console.log('Updated user:', updatedUser);
+
+    // If user is a stylist, update stylist document too
+    if (currentUser.role === 'stylist') {
+      const stylist = await Stylist.findOne({ email: currentUser.email });
+      if (stylist) {
+        const stylistUpdates = {};
+        if (username !== undefined) stylistUpdates.username = username;
+        if (email !== undefined) stylistUpdates.email = email;
+        
+        if (Object.keys(stylistUpdates).length > 0) {
+          await Stylist.updateOne(
+            { _id: stylist._id },
+            { $set: stylistUpdates }
+          );
+        }
+      }
+    }
+
     res.json(updatedUser);
   } catch (error) {
-    console.error('Error updating user:', error);
-    if (error.name === 'ValidationError') {
-      return res.status(400).json({ message: 'Validation error.', details: error.errors });
-    }
-    if (error.code === 11000) {
-      return res.status(400).json({ message: 'Duplicate key error.', details: error.message });
-    }
+    console.error('Error updating profile:', error);
     res.status(500).json({ message: 'Failed to update profile.', details: error.message });
   }
 });
