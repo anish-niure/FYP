@@ -1,20 +1,18 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
-  firstName: {
+  username: {
     type: String,
     required: true,
-    trim: true,
-  },
-  lastName: {
-    type: String,
-    required: true,
-    trim: true,
+    unique: true,
+    trim: true, // Trim whitespace
   },
   email: {
     type: String,
     required: true,
     unique: true,
+    trim: true,
   },
   password: {
     type: String,
@@ -22,8 +20,8 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'stylist', 'user'],
-    required: true,
+    enum: ['user', 'admin', 'stylist'],
+    default: 'user',
   },
   profilePicture: {
     type: String,
@@ -49,7 +47,7 @@ const userSchema = new mongoose.Schema({
   },
   gender: {
     type: String,
-    enum: ['Male', 'Female', 'Other'],
+    enum: ['male', 'female', 'other', ''],
     required: false,
   },
   location: {
@@ -59,15 +57,30 @@ const userSchema = new mongoose.Schema({
   adminLevel: {
     type: String,
   },
+  specializations: [
+    {
+      type: String,
+    },
+  ], // Add specializations array for stylists
+  secondaryRole: {
+    type: String,
+  },
+  description: {
+    type: String,
+  },
 });
 
-// Virtual field for username (derived from firstName and lastName)
-userSchema.virtual('username').get(function () {
-  return `${this.firstName} ${this.lastName}`.trim();
-}).set(function (value) {
-  const [firstName, ...lastNameParts] = value.split(' ');
-  this.firstName = firstName;
-  this.lastName = lastNameParts.join(' ') || '';
+// Password hashing method
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Ensure virtuals are included in toJSON and toObject

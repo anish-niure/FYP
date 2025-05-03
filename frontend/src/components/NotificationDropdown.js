@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../styles/NotificationDropdown.css';
 
@@ -8,6 +9,7 @@ const NotificationDropdown = ({ show, onClose }) => {
   const [loading, setLoading] = useState(true);
   const { user } = useContext(AuthContext);
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (show && user) {
@@ -35,14 +37,29 @@ const NotificationDropdown = ({ show, onClose }) => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const res = await axios.get('/api/store/notifications', {
+      
+      // Different endpoint for admin vs regular users
+      const endpoint = user.role === 'admin' 
+        ? '/api/admin/notifications'
+        : '/api/store/notifications';
+      
+      const res = await axios.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      
       setNotifications(res.data);
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
     } finally {
       setLoading(false);
+    }
+  };
+  
+  const handleNotificationClick = (notification) => {
+    // If notification has a link, navigate to it
+    if (notification.link) {
+      navigate(notification.link);
+      onClose();
     }
   };
 
@@ -62,7 +79,11 @@ const NotificationDropdown = ({ show, onClose }) => {
           <p className="notification-empty">No notifications.</p>
         ) : (
           notifications.map((notification) => (
-            <div key={notification._id} className="notification-item">
+            <div 
+              key={notification._id} 
+              className={`notification-item ${notification.type ? `notification-${notification.type}` : ''} ${notification.link ? 'clickable' : ''}`}
+              onClick={() => handleNotificationClick(notification)}
+            >
               <p>{notification.message}</p>
               <span className="notification-time">
                 {new Date(notification.date).toLocaleDateString()}

@@ -44,10 +44,43 @@ router.get('/services', async (req, res) => {
 // GET all stylists (public)
 router.get('/stylists', async (req, res) => {
     try {
-        const stylists = await User.find({ role: 'stylist' }).select('username email');
+        // Use the Stylist model instead of User model
+        const Stylist = require('../models/Stylist');
+        
+        // Fetch stylists with their secondary roles
+        const stylists = await Stylist.find()
+            .populate('userId', 'username email profilePicture');
+        
+        // Transform the data to match the expected format in the frontend
+        const formattedStylists = stylists.map(stylist => ({
+            _id: stylist.userId._id, // Use the user ID as the stylist ID for booking
+            username: stylist.username || stylist.userId.username,
+            email: stylist.email || stylist.userId.email,
+            profilePicture: stylist.userId.profilePicture || stylist.imageUrl,
+            secondaryRole: stylist.secondaryRole,
+            description: stylist.description
+        }));
+        
+        res.json(formattedStylists);
+    } catch (err) {
+        console.error('Error fetching stylists:', err);
+        res.status(500).json({ message: 'Failed to fetch stylists.' });
+    }
+});
+
+// GET stylists by service category (debugging route)
+router.get('/stylists-by-category/:category', async (req, res) => {
+    try {
+        const { category } = req.params;
+        const stylists = await User.find({ 
+            role: 'stylist',
+            secondaryRole: category
+        }).select('username email secondaryRole profilePicture');
+        
+        console.log(`Found ${stylists.length} stylists with secondaryRole "${category}"`);
         res.json(stylists);
     } catch (err) {
-        res.status(500).json({ message: 'Failed to fetch stylists.' });
+        res.status(500).json({ message: 'Failed to fetch stylists by category.' });
     }
 });
 
@@ -76,42 +109,67 @@ router.get('/availability', authenticate, async (req, res) => {
 
 // POST create a booking
 router.post('/', authenticate, async (req, res) => {
-    const { service, stylist, locationType, dateTime } = req.body;
+    const { services, stylist, locationType, dateTime, duration } = req.body;
 
-    if (!service || !stylist || !locationType || !dateTime) {
+    if (!services || services.length === 0 || !stylist || !locationType || !dateTime) {
         return res.status(400).json({ message: 'All fields are required.' });
     }
 
     try {
+        // Create a booking with multiple services
         const booking = new Booking({
             userId: req.user.id,
-            service,
+            services, // Array of service IDs
             stylist,
             locationType,
             dateTime: new Date(dateTime),
+            duration: duration || services.length * 45, // Default to 45 min per service
         });
         await booking.save();
 
-        // Create a notification for the user
-        const serviceDetails = await Service.findById(service);
+        // Get details for notifications
+        const serviceDetails = await Promise.all(
+            services.map(serviceId => Service.findById(serviceId))
+        );
+        
+        const serviceNames = serviceDetails.map(service => service.name).join(', ');
         const stylistDetails = await User.findById(stylist);
+        const userDetails = await User.findById(req.user.id);
 
-        const notification = new Notification({
+        // Create notification for user
+        const userNotification = new Notification({
             userId: req.user.id,
-            message: `You booked ${serviceDetails.name} with ${stylistDetails.username} on ${new Date(dateTime).toLocaleString('en-US', { 
+            message: `You booked ${serviceNames} with ${stylistDetails.username} on ${new Date(dateTime).toLocaleString('en-US', { 
                 month: 'long', 
                 day: 'numeric', 
                 year: 'numeric',
                 hour: 'numeric',
                 minute: 'numeric'
             })}.`,
-            date: new Date()
+            date: new Date(),
+            type: 'booking'
         });
-
-        await notification.save();
+        await userNotification.save();
+        
+        // Create notification for admin
+        const adminNotification = new Notification({
+            role: 'admin',
+            message: `${userDetails.username} booked ${serviceNames} with ${stylistDetails.username} on ${new Date(dateTime).toLocaleString('en-US', { 
+                month: 'long', 
+                day: 'numeric', 
+                year: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric'
+            })} at ${locationType}.`,
+            date: new Date(),
+            type: 'booking',
+            link: '/admin/appointments'
+        });
+        await adminNotification.save();
 
         res.status(201).json({ message: 'Booking created successfully!', booking });
     } catch (err) {
+        console.error('Error creating booking:', err);
         res.status(500).json({ message: 'Failed to create booking.' });
     }
 });
