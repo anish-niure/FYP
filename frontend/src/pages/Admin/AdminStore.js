@@ -80,39 +80,63 @@ const AdminStore = () => {
                 return;
             }
 
-            const formData = new FormData();
-            formData.append('name', editProduct ? editProduct.name : newProduct.name);
-            formData.append('description', editProduct ? editProduct.description : newProduct.description);
-            formData.append('price', editProduct ? editProduct.price : newProduct.price);
-
-            // Ensure that the image is appended only if the user selects a new one
-            if ((editProduct && editProduct.image) || (newProduct.image)) {
-                formData.append('image', (editProduct && editProduct.image) || newProduct.image); 
+            // Make sure data is valid before proceeding
+            const productName = editProduct ? editProduct.name : newProduct.name;
+            const productDescription = editProduct ? editProduct.description : newProduct.description;
+            const productPrice = editProduct ? editProduct.price : newProduct.price;
+            
+            if (!productName || !productDescription || !productPrice) {
+                setError('Please fill in all required fields.');
+                return;
             }
 
+            const formData = new FormData();
+            
+            // Append text fields with explicit toString() conversion
+            formData.append('name', productName.toString());
+            formData.append('description', productDescription.toString());
+            formData.append('price', productPrice.toString());
+
+            // Handle image file
+            const imageFile = editProduct ? editProduct.image : newProduct.image;
+            if (imageFile && imageFile instanceof File) {
+                formData.append('image', imageFile);
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    // Let axios set the content type automatically
+                }
+            };
+
+            // Proceed with the request
             if (editProduct) {
-                await axios.put(`/api/products/${editProduct._id}`, formData, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
+                await axios.put(`/api/products/${editProduct._id}`, formData, config);
                 setEditProduct(null);
             } else {
-                await axios.post('/api/products', formData, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
+                await axios.post('/api/products', formData, config);
             }
 
-            fetchProducts(); 
+            // Reset form after successful submission
+            setNewProduct({
+                name: '',
+                description: '',
+                price: '',
+                image: null,
+            });
+            
+            fetchProducts();
             setError('');
             alert(editProduct ? 'Product updated successfully!' : 'Product added successfully!');
         } catch (error) {
             console.error('Error adding/updating product:', error);
-            setError(error.response?.data?.message || 'Failed to add/update product. Please try again.');
+            if (error.response) {
+                console.error('Response data:', error.response.data);
+                setError(error.response.data?.message || 'Failed to add/update product. Please try again.');
+            } else {
+                setError('Network error or server not responding. Please try again.');
+            }
         }
     };
 

@@ -82,3 +82,35 @@
   justify-content: center;
   font-weight: bold;
 }
+
+.notification-item.clickable {
+  cursor: pointer;
+  position: relative;
+}
+
+.notification-item.clickable:after {
+  content: '›';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.4rem;
+  color: #ffd700;
+}
+
+.notification-item.clickable:hover {
+  background-color: #2d2d2d;
+}
+
+/* Different colors for different notification types */
+.notification-order {
+  border-left: 3px solid #4DFFA1; /* Teal for orders */
+}
+
+.notification-booking {
+  border-left: 3px solid #9F4DFF; /* Purple for bookings */
+}
+
+.notification-general {
+  border-left: 3px solid #ffd700; /* Gold for general */
+}

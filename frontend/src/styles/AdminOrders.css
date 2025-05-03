@@ -1,0 +1,159 @@
+.admin-orders {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #1C2526; /* Black background */
+    color: #FFD700; /* Yellow/Gold text */
+    min-height: 100vh; /* Full height */
+}
+
+/* Heading */
+.admin-orders h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #FFD700; /* Yellow/Gold */
+    font-size: 2.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Error message */
+.error-message {
+    color: #FF4D4D; /* Red for errors */
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    padding: 10px;
+    background-color: rgba(255, 77, 77, 0.1);
+    border-radius: 5px;
+}
+
+/* Success message */
+.success-message {
+    color: #4DFF77; /* Green for success */
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    padding: 10px;
+    background-color: rgba(77, 255, 119, 0.1);
+    border-radius: 5px;
+}
+
+.loading-message,
+.no-orders-message {
+    text-align: center;
+    margin: 40px 0;
+    font-size: 1.2rem;
+    color: #E0E0E0;
+}
+
+/* Orders table */
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #2A3435; /* Slightly lighter black for table */
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.orders-table th,
+.orders-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #3A4445; /* Darker line */
+}
+
+.orders-table th {
+    background-color: #FFD700; /* Yellow/Gold */
+    color: #1C2526; /* Black text */
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.orders-table tr:hover {
+    background-color: #3A4445; /* Darker shade for hover */
+}
+
+/* Order Status Dropdown */
+.status-dropdown {
+    padding: 8px 10px;
+    border-radius: 5px;
+    border: 1px solid #FFD700;
+    background-color: #2A3435;
+    color: #E0E0E0;
+    font-size: 0.9rem;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s;
+}
+
+.status-dropdown:hover {
+    background-color: #3A4445;
+}
+
+/* Status-specific colors */
+.status-pending {
+    color: #FFD700; /* Gold for pending */
+}
+
+.status-processing {
+    color: #4D9FFF; /* Blue for processing */
+}
+
+.status-packed {
+    color: #9F4DFF; /* Purple for packed */
+}
+
+.status-ready-for-pickup {
+    color: #FF9F4D; /* Orange for ready */
+}
+
+.status-shipped {
+    color: #4DFFA1; /* Teal for shipped */
+}
+
+.status-delivered {
+    color: #4DFF77; /* Green for delivered */
+}
+
+.status-cancelled {
+    color: #FF4D4D; /* Red for cancelled */
+}
+
+/* Delete button */
+.delete-btn {
+    padding: 8px 15px;
+    background-color: #FF4D4D; /* Red */
+    color: #FFFFFF;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.delete-btn:hover {
+    background-color: #FF3333;
+    transform: translateY(-2px);
+}
+
+.delete-btn:disabled {
+    background-color: #A07777;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .orders-table {
+        display: block;
+        overflow-x: auto;
+    }
+    
+    .admin-orders h1 {
+        font-size: 2rem;
+    }
+}

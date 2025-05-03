@@ -25,6 +25,7 @@ const Profile = () => {
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [resetToken, setResetToken] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [adminLevel, setAdminLevel] = useState('');
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -92,13 +93,76 @@ const Profile = () => {
       });
   }, [navigate, logout]);
 
+  useEffect(() => {
+    // Check if user is admin and set the appropriate tab
+    if (user?.role === 'admin') {
+      // You can add any admin-specific initialization here
+      console.log('Admin user detected');
+    }
+  }, [user]);
+
+  const refreshAllUserData = () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    
+    setError(''); // Clear any errors
+    
+    // Fetch user data
+    axios.get('http://localhost:5001/api/auth/me', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(response => {
+      const userData = response.data;
+      setUser(userData);
+      setUsername(userData.username || '');
+      setPhoneNumber(userData.phoneNumber || '');
+      setEmail(userData.email || '');
+      setGender(userData.gender || '');
+      setUserLocation(userData.location || '');
+      
+      // Set admin-specific fields if present
+      if (userData.adminLevel) {
+        setAdminLevel(userData.adminLevel);
+      }
+    })
+    .catch(error => {
+      console.error('Error refreshing user data:', error);
+    });
+    
+    // Fetch bookings
+    axios.get('http://localhost:5001/api/bookings/user', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(response => {
+      setBookings(response.data);
+    })
+    .catch(error => {
+      console.error('Error refreshing bookings:', error);
+    });
+    
+    // Fetch purchases
+    axios.get('/api/store/purchases', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(response => {
+      setPurchases(response.data);
+    })
+    .catch(error => {
+      console.error('Error refreshing purchases:', error);
+    });
+  };
+
   const handleSaveProfileClick = async () => {
     const token = localStorage.getItem('token');
     const formData = new FormData();
 
-    // Validate inputs
     if (!username && !phoneNumber && !email && !gender && !userLocation && !profilePicture) {
       setError('Please provide at least one field to update.');
+      return;
+    }
+
+    if (username && username.length < 3) {
+      setError('Username must be at least 3 characters long.');
       return;
     }
 
@@ -107,12 +171,16 @@ const Profile = () => {
       return;
     }
 
+    if (phoneNumber && !/^\d{10,15}$/.test(phoneNumber.replace(/[^\d]/g, ''))) {
+      setError('Please enter a valid phone number (10-15 digits).');
+      return;
+    }
+
     if (gender && !['Male', 'Female', 'Other'].includes(gender)) {
       setError('Invalid gender selection.');
       return;
     }
 
-    // Append only non-empty fields
     if (username.trim()) formData.append('username', username.trim());
     if (phoneNumber.trim()) formData.append('phoneNumber', phoneNumber.trim());
     if (email.trim()) formData.append('email', email.trim());
@@ -122,9 +190,8 @@ const Profile = () => {
       formData.append('profilePicture', profilePicture);
     }
 
-    console.log('FormData being sent:');
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
+    if (user?.role === 'admin' && adminLevel) {
+      formData.append('adminLevel', adminLevel);
     }
 
     try {
@@ -133,7 +200,8 @@ const Profile = () => {
         formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
           },
         }
       );
@@ -145,17 +213,31 @@ const Profile = () => {
       setEmail(updatedUser.email || '');
       setGender(updatedUser.gender || '');
       setUserLocation(updatedUser.location || '');
+
+      if (updatedUser.adminLevel) {
+        setAdminLevel(updatedUser.adminLevel);
+      }
+
       localStorage.setItem('user', JSON.stringify(updatedUser));
       setIsEditing(false);
       setProfilePicture(null);
-      setError('');
+
+      const successElement = document.createElement('div');
+      successElement.className = 'success-message-popup';
+      successElement.textContent = 'Profile updated successfully!';
+      document.body.appendChild(successElement);
+
+      setTimeout(() => {
+        if (document.querySelector('.success-message-popup')) {
+          document.body.removeChild(document.querySelector('.success-message-popup'));
+        }
+
+        refreshAllUserData();
+      }, 2000);
     } catch (error) {
-      console.error('Error updating profile:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-      });
-      setError(error.response?.data?.message || 'Failed to update profile. Please try again.');
+      console.error('Error updating profile:', error);
+      setError(`Failed to update profile: ${error.response?.data?.message || error.message}`);
+      setIsEditing(true);
     }
   };
 
@@ -219,14 +301,21 @@ const Profile = () => {
 
   const renderMyProfileSection = () => (
     <div className="my-profile-section">
-      <h2>My Profile</h2>
+      <h2>My Profile {user?.role === 'admin' && '(Admin)'}</h2>
       <div className="profile-info">
-        {user?.profilePicture && (
+        {user?.profilePicture ? (
           <img
-            src={user.profilePicture || placeholderImage}
+            src={user.profilePicture}
             alt="Profile"
             className="profile-picture"
-            style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+            style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover' }}
+          />
+        ) : (
+          <img
+            src={placeholderImage}
+            alt="Profile"
+            className="profile-picture"
+            style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover' }}
           />
         )}
         <div className="edit-field">
@@ -288,16 +377,40 @@ const Profile = () => {
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => setProfilePicture(e.target.files[0])}
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setProfilePicture(e.target.files[0]);
+                }
+              }}
+              className="file-input"
             />
             {profilePicture && (
-              <img
-                src={typeof profilePicture === 'string' ? profilePicture : URL.createObjectURL(profilePicture)}
-                alt="Profile Preview"
-                className="profile-picture-preview"
-                style={{ width: '100px', height: '100px', borderRadius: '50%' }}
-              />
+              <div className="preview-container">
+                <img
+                  src={typeof profilePicture === 'string' 
+                    ? profilePicture 
+                    : URL.createObjectURL(profilePicture)}
+                  alt="Profile Preview"
+                  className="profile-picture-preview"
+                  style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', marginTop: '10px' }}
+                />
+                <p className="preview-text">Preview</p>
+              </div>
             )}
+          </div>
+        )}
+        {user?.role === 'admin' && isEditing && (
+          <div className="edit-field admin-field">
+            <label>Admin Level:</label>
+            <select
+              value={adminLevel || ''}
+              onChange={(e) => setAdminLevel(e.target.value)}
+              disabled={!isEditing}
+            >
+              <option value="1">Level 1</option>
+              <option value="2">Level 2</option>
+              <option value="3">Level 3</option>
+            </select>
           </div>
         )}
         {isEditing ? (
@@ -319,7 +432,7 @@ const Profile = () => {
         </button>
       </div>
       {error && (
-        <p className="error-text" style={{ color: error.includes('successful') ? '#28a745' : '#dc3545' }}>
+        <p className={error.includes('successful') ? 'success-message' : 'error-text'}>
           {error}
         </p>
       )}

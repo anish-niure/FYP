@@ -18,6 +18,7 @@ import AdminStylists from './pages/Admin/AdminStylists';
 import AdminService from './pages/Admin/AdminService';
 import AdminStore from './pages/Admin/AdminStore';
 import AdminAppointments from './pages/Admin/AdminAppointments';
+import AdminOrders from './pages/Admin/AdminOrders';
 import Modal from './components/Modal';
 import ForgotPassword from './components/ForgotPassword';
 
@@ -47,6 +48,9 @@ function App() {
           <Route path="/admin/store" element={<AdminStore />} />
           <Route path="/admin/user-management" element={<AdminUserManagement />} />
           <Route path="/admin/appointments" element={<AdminAppointments />} />
+          <Route path="/admin/orders" element={<AdminOrders />} />
+          {/* Add more routes as needed */}
+          {/* Redirect to home if no route matches */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
         <Modal isOpen={modalOpen} closeModal={() => setModalOpen(false)} />

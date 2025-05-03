@@ -45,7 +45,7 @@ const Services = () => {
               <img src={service.imageUrl} alt={service.name} className="service-image" />
               <h3>{service.name}</h3>
               <p>{service.priceRange}</p>
-              <Link to={`/booking/${service._id}`} className="book-now-btn">
+              <Link to={`/booking?serviceId=${service._id}`} className="book-now-btn">
                 Book Now
               </Link>
             </div>

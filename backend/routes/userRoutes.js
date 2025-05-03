@@ -58,27 +58,33 @@ router.get('/users', verifyAdmin, async (req, res) => {
 });
 
 // Update user profile
-router.post('/update', authenticate, upload.single('profilePicture'), handleMulterError, async (req, res) => {
+router.post('/update', authenticate, async (req, res) => {
   try {
     console.log('Incoming request body:', req.body);
-    console.log('Incoming file:', req.file);
+    console.log('Incoming files:', req.files);
 
-    const { username, phoneNumber, gender, location, email } = req.body;
+    const { username, phoneNumber, gender, location, email, adminLevel } = req.body;
     const userId = req.user.id;
-
-    // Validate input fields
-    if (!username && !phoneNumber && !gender && !location && !email && !req.file) {
-      return res.status(400).json({ message: 'No valid fields provided for update.' });
+    
+    // Get the current user to check role
+    const currentUser = await User.findById(userId);
+    if (!currentUser) {
+      return res.status(404).json({ message: 'User not found.' });
     }
 
-    // Validate gender if provided
-    if (gender && !['Male', 'Female', 'Other'].includes(gender)) {
-      return res.status(400).json({ message: 'Invalid gender value. Must be Male, Female, or Other.' });
+    // Validate input fields
+    if (!username && !phoneNumber && !gender && !location && !email && !req.files && 
+        !(currentUser.role === 'admin' && adminLevel)) {
+      return res.status(400).json({ message: 'No valid fields provided for update.' });
     }
 
     // Prepare updates
     const updates = {};
-    if (username) updates.username = username; // Virtual field sets firstName and lastName
+    if (username) {
+      const nameParts = username.split(' ');
+      updates.firstName = nameParts[0] || '';
+      updates.lastName = nameParts.slice(1).join(' ') || '';
+    }
     if (phoneNumber) updates.phoneNumber = phoneNumber;
     if (gender) updates.gender = gender;
     if (location) updates.location = location;
@@ -90,11 +96,17 @@ router.post('/update', authenticate, upload.single('profilePicture'), handleMult
       }
       updates.email = email;
     }
+    
+    // Handle admin-specific fields
+    if (currentUser.role === 'admin' && adminLevel) {
+      updates.adminLevel = adminLevel;
+    }
 
     // Handle image upload to Cloudinary
-    if (req.file) {
+    if (req.files && req.files.profilePicture) {
       try {
-        const result = await cloudinary.uploader.upload(req.file.path, {
+        const file = req.files.profilePicture;
+        const result = await cloudinary.uploader.upload(file.tempFilePath, {
           folder: 'profile_pictures',
         });
         updates.profilePicture = result.secure_url;
@@ -127,10 +139,7 @@ router.post('/update', authenticate, upload.single('profilePicture'), handleMult
     if (error.code === 11000) {
       return res.status(400).json({ message: 'Duplicate key error.', details: error.message });
     }
-    if (error.message.includes('Cloudinary')) {
-      return res.status(500).json({ message: 'Cloudinary upload error.', details: error.message });
-    }
-    return res.status(500).json({ message: 'Failed to update user.', details: error.message });
+    res.status(500).json({ message: 'Failed to update profile.', details: error.message });
   }
 });
 

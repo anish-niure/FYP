@@ -91,12 +91,31 @@ const Booking = () => {
         }
 
         try {
+            // Get service and stylist names for better feedback
+            const selectedService = services.find(s => s._id === formData.service);
+            const selectedStylist = stylists.find(s => s._id === formData.stylist);
+            
+            // Create the booking
             await axios.post(
                 'http://localhost:5001/api/bookings',
                 formData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert('Booking created successfully!');
+            
+            // Show success notification
+            const successElement = document.createElement('div');
+            successElement.className = 'success-message-popup';
+            successElement.textContent = 'Booking created successfully!';
+            document.body.appendChild(successElement);
+            
+            // Remove popup after 2 seconds
+            setTimeout(() => {
+                if (document.querySelector('.success-message-popup')) {
+                    document.body.removeChild(document.querySelector('.success-message-popup'));
+                }
+            }, 2000);
+            
+            // Reset form
             setFormData({ service: '', stylist: '', locationType: 'Salon', dateTime: '' });
             setAvailableSlots([]);
             setError('');

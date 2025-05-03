@@ -3,6 +3,7 @@ const router = express.Router();
 const Booking = require('../models/Booking');
 const Service = require('../models/Service');
 const User = require('../models/User');
+const Notification = require('../models/Notification'); // Import the Notification model
 const { authenticate } = require('../middleware/authMiddleware');
 
 // Salon hours
@@ -90,6 +91,43 @@ router.post('/', authenticate, async (req, res) => {
             dateTime: new Date(dateTime),
         });
         await booking.save();
+
+        // Get details for notifications
+        const serviceDetails = await Service.findById(service);
+        const stylistDetails = await User.findById(stylist);
+        const userDetails = await User.findById(req.user.id);
+
+        // Create notification for user
+        const userNotification = new Notification({
+            userId: req.user.id,
+            message: `You booked ${serviceDetails.name} with ${stylistDetails.username} on ${new Date(dateTime).toLocaleString('en-US', { 
+                month: 'long', 
+                day: 'numeric', 
+                year: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric'
+            })}.`,
+            date: new Date(),
+            type: 'booking'
+        });
+        await userNotification.save();
+        
+        // Create notification for admin
+        const adminNotification = new Notification({
+            role: 'admin',
+            message: `${userDetails.username} booked ${serviceDetails.name} with ${stylistDetails.username} on ${new Date(dateTime).toLocaleString('en-US', { 
+                month: 'long', 
+                day: 'numeric', 
+                year: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric'
+            })} at ${locationType}.`,
+            date: new Date(),
+            type: 'booking',
+            link: '/admin/appointments'
+        });
+        await adminNotification.save();
+
         res.status(201).json({ message: 'Booking created successfully!', booking });
     } catch (err) {
         res.status(500).json({ message: 'Failed to create booking.' });

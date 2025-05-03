@@ -82,8 +82,8 @@
 
 /* Client Image */
 .client-image {
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     margin-bottom: var(--spacing-sm);
     object-fit: cover;
@@ -91,6 +91,11 @@
     image-rendering: crisp-edges;
     filter: brightness(1.1) contrast(1.1);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.review-card:hover .client-image {
+    transform: scale(1.05);
 }
 
 /* Review Card Text */
@@ -167,4 +172,32 @@
     font-size: 0.9rem;
     width: 100%;
     margin-top: var(--spacing-lg);
+}
+
+/* Specialization styling */
+.specialization {
+    color: var(--gold-accent);
+    font-weight: 500;
+    font-style: normal;
+    margin-bottom: var(--spacing-sm);
+    font-size: 0.95rem;
+}
+
+/* Additional responsive adjustments */
+@media (max-width: 768px) {
+    .client-reviews {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: var(--spacing-md);
+    }
+}
+
+@media (max-width: 480px) {
+    .client-reviews {
+        grid-template-columns: 1fr;
+    }
+    
+    .client-image {
+        width: 100px;
+        height: 100px;
+    }
 }

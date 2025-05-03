@@ -14,7 +14,7 @@ const OurTeam = () => {
                 const response = await axios.get('http://localhost:5001/api/stylists/public');
                 setStylists(response.data.map(stylist => ({
                     ...stylist,
-                    imageUrl: stylist.imageUrl || '/assets/images/placeholder.png', // Ensure imageUrl is used
+                    imageUrl: stylist.imageUrl || '/assets/images/placeholder.png'
                 })));
             } catch (error) {
                 console.error('Error fetching stylists:', error);
@@ -29,47 +29,45 @@ const OurTeam = () => {
     };
 
     return (
-        <div className="our-team-page">
+        <div className="clients-page">
             <Navbar />
-            <div className="our-team-header">
+            <div className="clients-header">
                 <h1>Meet Our Team</h1>
                 <p>Get to know the professionals behind Moon's Salon.</p>
             </div>
 
-            <div className="team-members">
+            <div className="client-reviews">
                 {stylists.slice(0, 3).map((stylist, index) => (
-                    <div className="team-card" key={index}>
+                    <div className="review-card" key={index}>
                         <img
                             src={stylist.imageUrl}
                             alt={stylist.userId?.username || 'Stylist'}
-                            className="team-image"
-                            style={{ width: '150px', height: '150px', borderRadius: '50%', objectFit: 'cover' }}
+                            className="client-image"
                         />
                         <h3>{stylist.userId?.username || 'Unknown'}</h3>
-                        <h4>Specialization: {stylist.secondaryRole || 'Not specified'}</h4>
+                        <p className="specialization">Specialization: {stylist.secondaryRole || 'Not specified'}</p>
                         <p>{stylist.description || 'No description available.'}</p>
                     </div>
                 ))}
             </div>
 
             {stylists.length > 3 && (
-                <div className="more-team-section">
+                <div className="more-reviews-section">
                     <button className="show-more-btn" onClick={handleShowMore}>
                         {showMore ? 'Hide Team Members' : 'Show More Team Members'}
                     </button>
 
                     {showMore && (
-                        <div className={`additional-team ${showMore ? 'slide-in' : ''}`}>
+                        <div className={`additional-reviews ${showMore ? 'slide-in' : ''}`}>
                             {stylists.slice(3).map((stylist, index) => (
-                                <div className="team-card additional" key={index + 3}>
+                                <div className="review-card additional" key={index + 3}>
                                     <img
                                         src={stylist.imageUrl}
                                         alt={stylist.userId?.username || 'Stylist'}
-                                        className="team-image"
-                                        style={{ width: '150px', height: '150px', borderRadius: '50%', objectFit: 'cover' }}
+                                        className="client-image"
                                     />
                                     <h3>{stylist.userId?.username || 'Unknown'}</h3>
-                                    <h4>Specialization: {stylist.secondaryRole || 'Not specified'}</h4>
+                                    <p className="specialization">Specialization: {stylist.secondaryRole || 'Not specified'}</p>
                                     <p>{stylist.description || 'No description available.'}</p>
                                 </div>
                             ))}

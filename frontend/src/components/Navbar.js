@@ -20,8 +20,25 @@ const Navbar = ({ openModal }) => {
   useEffect(() => {
     if (user) {
       fetchNotificationCount();
+      
+      // Set up an interval to periodically check for new notifications
+      const interval = setInterval(fetchNotificationCount, 60000); // Check every minute
+      
+      return () => clearInterval(interval);
     }
   }, [user]);
+
+  useEffect(() => {
+    const handleBookingCreated = () => {
+      fetchNotificationCount();
+    };
+    
+    document.addEventListener('bookingCreated', handleBookingCreated);
+    
+    return () => {
+      document.removeEventListener('bookingCreated', handleBookingCreated);
+    };
+  }, []);
 
   const fetchNotificationCount = async () => {
     try {
@@ -69,7 +86,7 @@ const Navbar = ({ openModal }) => {
           <ul className="dropdown-menu">
             <li><Link to="/services">Services</Link></li>
             <li><Link to="/user/about">About Us</Link></li>
-            <li><Link to="/user/clients">Our Clients</Link></li>
+            <li><Link to="/user/clients">Our Team</Link></li>
             <li><Link to="/user/contact">Contact Info</Link></li>
             <li>
               <Link to="/booking" onClick={handleBookAppointmentClick}>Book Appointment</Link>

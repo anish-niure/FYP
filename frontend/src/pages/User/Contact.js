@@ -20,21 +20,47 @@ const Contact = () => {
         <div className="contact-row contact-row-first">
           <div className="contact-info">
             <h2>Our Contact Details</h2>
-            <p><strong>Address:</strong> Battisputali, Kathmandu, Nepal</p>
-            <p><strong>Phone:</strong> 9812345678</p>
-            <p><strong>Email:</strong> info@moonsalon.com</p>
-            <p><strong>Hours:</strong> Mon-Fri: 9 AM - 7 PM, Sat: 10 AM - 5 PM, Sun: Closed</p>
+            
+            <div className="contact-details-container">
+              <div className="contact-details-grid">
+                <div className="contact-info-row">
+                  <span className="contact-label">Address:</span>
+                  <span className="contact-value">Battisputali, Kathmandu, Nepal</span>
+                </div>
+                
+                <div className="contact-info-row">
+                  <span className="contact-label">Phone:</span>
+                  <span className="contact-value">9812345678</span>
+                </div>
+                
+                <div className="contact-info-row">
+                  <span className="contact-label">Email:</span>
+                  <span className="contact-value">info@moonsalon.com</span>
+                </div>
+                
+                <div className="contact-info-row">
+                  <span className="contact-label">Hours:</span>
+                  <div className="contact-hours">
+                    <span>Mon-Fri: 9 AM - 7 PM</span>
+                    <span>Sat: 10 AM - 5 PM</span>
+                    <span>Sun: Closed</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-            <div className="social-links">
-              <a href="https://facebook.com/moonsalon" target="_blank" rel="noopener noreferrer">
-                <img src={facebookIcon} alt="Facebook" className="social-icon" onError={(e) => { e.target.src = 'https://via.placeholder.com/24'; }} />
-              </a>
-              <a href="https://tiktok.com/@moonsalon" target="_blank" rel="noopener noreferrer">
-                <img src={tiktokIcon} alt="TikTok" className="social-icon" onError={(e) => { e.target.src = 'https://via.placeholder.com/24'; }} />
-              </a>
-              <a href="https://instagram.com/moonsalon" target="_blank" rel="noopener noreferrer">
-                <img src={instagramIcon} alt="Instagram" className="social-icon" onError={(e) => { e.target.src = 'https://via.placeholder.com/24'; }} />
-              </a>
+            <div className="social-links-container">
+              <div className="social-links">
+                <a href="https://facebook.com/moonsalon" target="_blank" rel="noopener noreferrer">
+                  <img src={facebookIcon} alt="Facebook" className="social-icon" onError={(e) => { e.target.src = 'https://via.placeholder.com/24'; }} />
+                </a>
+                <a href="https://tiktok.com/@moonsalon" target="_blank" rel="noopener noreferrer">
+                  <img src={tiktokIcon} alt="TikTok" className="social-icon" onError={(e) => { e.target.src = 'https://via.placeholder.com/24'; }} />
+                </a>
+                <a href="https://instagram.com/moonsalon" target="_blank" rel="noopener noreferrer">
+                  <img src={instagramIcon} alt="Instagram" className="social-icon" onError={(e) => { e.target.src = 'https://via.placeholder.com/24'; }} />
+                </a>
+              </div>
             </div>
           </div>
 
