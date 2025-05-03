@@ -2,11 +2,14 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 const { verifyAdmin } = require('../middleware/authMiddleware');
+const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
-const fs = require('fs');
-const path = require('path');
 
-// Configure Cloudinary (this should match your server.js config)
+// Configure multer for file uploads (using memory storage to upload directly to Cloudinary)
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -24,7 +27,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST a new product (admin only)
-router.post('/', verifyAdmin, async (req, res) => {
+router.post('/', verifyAdmin, upload.single('image'), async (req, res) => {
     try {
         const { name, description, price } = req.body;
 
@@ -33,52 +36,53 @@ router.post('/', verifyAdmin, async (req, res) => {
             return res.status(400).json({ message: 'Fields (name, description, price) are required' });
         }
 
-        let imageUrl = '';
+        const result = await cloudinary.uploader.upload_stream(
+            { resource_type: 'auto' },
+            async (error, result) => {
+                if (error) {
+                    return res.status(500).json({ error: error.message });
+                }
 
-        // Check if image file exists in the request
-        if (req.files && req.files.image) {
-            const file = req.files.image;
-            
-            // Upload to Cloudinary
-            const result = await cloudinary.uploader.upload(file.tempFilePath);
-            imageUrl = result.secure_url;
-            
-            // Clean up the temp file
-            fs.unlinkSync(file.tempFilePath);
-        }
+                const imageUrl = result.secure_url; // Save the Cloudinary image URL
+                const product = new Product({
+                    name,
+                    description,
+                    price,
+                    imageUrl,
+                });
 
-        // Create and save the product
-        const product = new Product({
-            name,
-            description,
-            price: Number(price),
-            imageUrl
-        });
-
-        await product.save();
-        res.status(201).json({ message: 'Product created successfully', product });
+                await product.save();
+                res.status(201).json({ message: 'Product created successfully', product });
+            }
+        ).end(req.file.buffer);  
     } catch (error) {
-        console.error('Error creating product:', error);
         res.status(500).json({ message: 'Server error while creating product' });
     }
 });
 
 // PUT update a product (admin only)
-router.put('/:id', verifyAdmin, async (req, res) => {
+router.put('/:id', verifyAdmin, upload.single('image'), async (req, res) => {
     try {
         const { name, description, price } = req.body;
-        const updateData = { name, description, price: Number(price) };
+        const updateData = { name, description, price };
 
         // If a new image is uploaded, update imageUrl
-        if (req.files && req.files.image) {
-            const file = req.files.image;
-            
-            // Upload to Cloudinary
-            const result = await cloudinary.uploader.upload(file.tempFilePath);
-            updateData.imageUrl = result.secure_url;
-            
-            // Clean up the temp file
-            fs.unlinkSync(file.tempFilePath);
+        if (req.file) {
+            // Upload image to Cloudinary and get the URL
+            const result = await new Promise((resolve, reject) => {
+                cloudinary.uploader.upload_stream(
+                    { resource_type: 'auto' },
+                    (error, result) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(result);
+                        }
+                    }
+                ).end(req.file.buffer);
+            });
+
+            updateData.imageUrl = result.secure_url; // Save the Cloudinary image URL
         }
 
         // Update the product with the new data
@@ -89,7 +93,7 @@ router.put('/:id', verifyAdmin, async (req, res) => {
 
         res.json({ message: 'Product updated successfully', product });
     } catch (error) {
-        console.error('Error updating product:', error);
+        console.error(error);
         res.status(500).json({ message: 'Server error while updating product' });
     }
 });

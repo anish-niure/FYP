@@ -4,7 +4,6 @@ const Product = require('../models/Product');
 const Purchase = require('../models/Purchase');
 const Cart = require('../models/Cart');
 const Notification = require('../models/Notification');
-const User = require('../models/User'); // Added User model
 const { verifyToken } = require('../middleware/authMiddleware');
 
 // Get all products
@@ -119,25 +118,13 @@ router.post('/checkout', verifyToken, async (req, res) => {
       await purchase.save();
       purchases.push(purchase);
 
-      // Create notification for user
-      const userNotification = new Notification({
+      // Create notification for each purchase
+      const notification = new Notification({
         userId,
         message: `You purchased ${item.productName} (x${item.quantity}) for $${(item.price * item.quantity).toFixed(2)}.`,
-        date: new Date(),
-        type: 'order'
+        date: new Date()
       });
-      await userNotification.save();
-      
-      // Create notification for admin
-      const user = await User.findById(userId);
-      const adminNotification = new Notification({
-        role: 'admin',
-        message: `${user.username} purchased ${item.productName} (x${item.quantity}) for $${(item.price * item.quantity).toFixed(2)}.`,
-        date: new Date(),
-        type: 'order',
-        link: '/admin/orders'
-      });
-      await adminNotification.save();
+      await notification.save();
     }
 
     // Clear the cart

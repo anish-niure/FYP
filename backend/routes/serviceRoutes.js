@@ -1,9 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const Service = require('../models/Service');
 const { verifyAdmin } = require('../middleware/authMiddleware');
-const fs = require('fs');
+
+// Configure Multer for file uploads (using memory storage to upload directly to Cloudinary)
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 // Configure Cloudinary
 cloudinary.config({
@@ -25,7 +29,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST a new service (admin only)
-router.post('/', verifyAdmin, async (req, res) => {
+router.post('/', verifyAdmin, upload.single('image'), async (req, res) => {
     console.log('POST /api/services hit');
     try {
         const { name, description, priceRange } = req.body;
@@ -36,17 +40,20 @@ router.post('/', verifyAdmin, async (req, res) => {
         }
 
         let imageUrl = 'https://via.placeholder.com/150'; // Default image if none provided
-
-        // Check if image file exists in the request
-        if (req.files && req.files.image) {
-            const file = req.files.image;
-            
-            // Upload to Cloudinary
-            const result = await cloudinary.uploader.upload(file.tempFilePath);
+        if (req.file) {
+            const result = await new Promise((resolve, reject) => {
+                cloudinary.uploader.upload_stream(
+                    { resource_type: 'auto' },
+                    (error, result) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(result);
+                        }
+                    }
+                ).end(req.file.buffer);
+            });
             imageUrl = result.secure_url;
-            
-            // Clean up the temp file
-            fs.unlinkSync(file.tempFilePath);
         }
 
         const service = new Service({
@@ -65,7 +72,7 @@ router.post('/', verifyAdmin, async (req, res) => {
 });
 
 // PUT update a service (admin only)
-router.put('/:id', verifyAdmin, async (req, res) => {
+router.put('/:id', verifyAdmin, upload.single('image'), async (req, res) => {
     console.log(`PUT /api/services/${req.params.id} hit`);
     try {
         const { name, description, priceRange } = req.body;
@@ -83,15 +90,20 @@ router.put('/:id', verifyAdmin, async (req, res) => {
         };
 
         // If a new image is uploaded, update the imageUrl
-        if (req.files && req.files.image) {
-            const file = req.files.image;
-            
-            // Upload to Cloudinary
-            const result = await cloudinary.uploader.upload(file.tempFilePath);
+        if (req.file) {
+            const result = await new Promise((resolve, reject) => {
+                cloudinary.uploader.upload_stream(
+                    { resource_type: 'auto' },
+                    (error, result) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(result);
+                        }
+                    }
+                ).end(req.file.buffer);
+            });
             updateData.imageUrl = result.secure_url;
-            
-            // Clean up the temp file
-            fs.unlinkSync(file.tempFilePath);
         }
 
         const service = await Service.findByIdAndUpdate(req.params.id, updateData, { new: true });

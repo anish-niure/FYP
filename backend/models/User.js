@@ -1,17 +1,20 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  username: {
+  firstName: {
     type: String,
     required: true,
-    unique: true,
-    trim: true,  // Trim whitespace
+    trim: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
+    trim: true,
   },
   email: {
     type: String,
     required: true,
     unique: true,
-    trim: true,
   },
   password: {
     type: String,
@@ -19,8 +22,8 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'admin', 'stylist'],
-    default: 'user',
+    enum: ['admin', 'stylist', 'user'],
+    required: true,
   },
   profilePicture: {
     type: String,
@@ -56,6 +59,15 @@ const userSchema = new mongoose.Schema({
   adminLevel: {
     type: String,
   },
+});
+
+// Virtual field for username (derived from firstName and lastName)
+userSchema.virtual('username').get(function () {
+  return `${this.firstName} ${this.lastName}`.trim();
+}).set(function (value) {
+  const [firstName, ...lastNameParts] = value.split(' ');
+  this.firstName = firstName;
+  this.lastName = lastNameParts.join(' ') || '';
 });
 
 // Ensure virtuals are included in toJSON and toObject

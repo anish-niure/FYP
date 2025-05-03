@@ -80,30 +80,30 @@ const AdminService = () => {
             }
 
             const formData = new FormData();
-            
-            // Add text fields
             formData.append('name', editService ? editService.name : newService.name);
             formData.append('description', editService ? editService.description : newService.description);
             formData.append('priceRange', editService ? editService.priceRange : newService.priceRange);
 
-            // Add image if it exists
-            const imageFile = editService ? editService.image : newService.image;
-            if (imageFile && imageFile instanceof File) {
-                formData.append('image', imageFile);
+            // Append image only if provided
+            if ((editService && editService.image) || newService.image) {
+                formData.append('image', (editService && editService.image) || newService.image);
             }
 
-            // Let axios set the content type automatically
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            };
-
             if (editService) {
-                await axios.put(`/api/services/${editService._id}`, formData, config);
+                await axios.put(`/api/services/${editService._id}`, formData, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
                 setEditService(null);
             } else {
-                await axios.post('/api/services', formData, config);
+                await axios.post('/api/services', formData, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
             }
 
             setNewService({ name: '', description: '', priceRange: '', image: null });

@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const Notification = require('../models/Notification');
 const bcrypt = require('bcrypt');
-const { authenticate, authorize, verifyAdmin } = require('../middleware/authMiddleware');
+const { authenticate, authorize } = require('../middleware/authMiddleware');
 
 // Debug route to confirm the base path is working
 router.get('/test', (req, res) => {
@@ -53,22 +52,6 @@ router.post('/create-stylist', authenticate, authorize(['admin']), async (req, r
         });
     } catch (err) {
         res.status(500).json({ message: 'Server error during stylist creation.' });
-    }
-});
-
-// Get admin notifications
-router.get('/notifications', verifyAdmin, async (req, res) => {
-    try {
-        const notifications = await Notification.find({ 
-            role: 'admin'  // Only get notifications specifically for admin role
-        })
-        .sort({ date: -1 })
-        .limit(20);
-        
-        res.json(notifications);
-    } catch (error) {
-        console.error('Error fetching admin notifications:', error);
-        res.status(500).json({ message: 'Failed to fetch notifications.' });
     }
 });
 

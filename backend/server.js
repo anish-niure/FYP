@@ -8,8 +8,6 @@ const connectDB = require('./config/db');
 const storeRoutes = require('./routes/storeRoutes');
 const path = require('path');
 const fs = require('fs');
-const orderRoutes = require('./routes/orderRoutes');
-const adminRoutes = require('./routes/adminRoutes'); // Added adminRoutes require statement
 
 const app = express();
 dotenv.config();
@@ -26,7 +24,7 @@ const allowedOrigins = ['http://localhost:3000'];
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Fixed typo: '-delete' → 'DELETE'
+  methods: ['GET', 'POST', 'PUT', '-delete', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
 }));
 
@@ -56,6 +54,7 @@ app.get('/', (req, res) => {
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const stylistRoutes = require('./routes/stylistRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const productRoutes = require('./routes/productRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
@@ -68,7 +67,6 @@ console.log('Loaded routes:', {
   admin: adminRoutes.stack.length > 0,
   services: serviceRoutes.stack.length > 0,
   products: productRoutes.stack.length > 0,
-  orders: orderRoutes.stack.length > 0,
 });
 
 // Mount routes
@@ -76,11 +74,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/stylists', stylistRoutes);
-app.use('/api/admin', adminRoutes); // Added adminRoutes mount statement
+app.use('/api/admin', adminRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/store', storeRoutes);
-app.use('/api/orders', orderRoutes);
 
 // Debug middleware to log incoming requests
 app.use((req, res, next) => {

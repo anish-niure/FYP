@@ -93,42 +93,6 @@
   cursor: not-allowed;
 }
 
-.create-stylist-form select.role-dropdown,
-.create-stylist-form textarea.stylist-description {
-  padding: 10px;
-  font-size: 1rem;
-  border: 1px solid #FFC107;
-  border-radius: 5px;
-  background-color: #FFFFFF;
-  color: #000000;
-  width: 100%;
-}
-
-.create-stylist-form textarea.stylist-description {
-  resize: vertical;
-  min-height: 80px;
-}
-
-.create-stylist-form select.role-dropdown:focus,
-.create-stylist-form textarea.stylist-description:focus {
-  outline: none;
-  border-color: #E0A800;
-  box-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
-}
-
-.create-stylist-form select.role-dropdown:disabled,
-.create-stylist-form textarea.stylist-description:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
-
-.create-stylist-form .file-hint {
-  font-size: 0.8rem;
-  color: #FFC107;
-  margin-top: -10px;
-  margin-bottom: 5px;
-}
-
 .stylists-table {
   width: 100%;
   border-collapse: collapse;

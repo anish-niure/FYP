@@ -5,18 +5,10 @@ import '../../styles/AdminStylists.css';
 
 const AdminStylists = () => {
   const [stylists, setStylists] = useState([]);
-  const [formData, setFormData] = useState({ 
-    username: '', 
-    email: '', 
-    password: '', 
-    image: null,
-    secondaryRole: 'Hair Style', // Default value
-    description: '' 
-  });
+  const [formData, setFormData] = useState({ username: '', email: '', password: '', image: null });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  const [deletingId, setDeletingId] = useState(null);
   const navigate = useNavigate();
 
   const token = localStorage.getItem('token');
@@ -67,24 +59,10 @@ const AdminStylists = () => {
       setError('');
       setSuccess('');
 
-      // Log what we're sending to the server
-      console.log('Sending to server:', {
-        username: formData.username,
-        email: formData.email,
-        password: '****' + formData.password.slice(-4), // Only show last 4 chars for security
-        secondaryRole: formData.secondaryRole,
-        description: formData.description,
-        hasImage: formData.image ? true : false
-      });
-
       const formDataToSend = new FormData();
-      formDataToSend.append('username', formData.username.trim());
-      formDataToSend.append('email', formData.email.trim());
+      formDataToSend.append('username', formData.username);
+      formDataToSend.append('email', formData.email);
       formDataToSend.append('password', formData.password);
-      formDataToSend.append('secondaryRole', formData.secondaryRole);
-      formDataToSend.append('description', formData.description);
-      
-      // Only append the image if it exists
       if (formData.image) {
         formDataToSend.append('image', formData.image);
       }
@@ -101,19 +79,7 @@ const AdminStylists = () => {
       );
 
       setSuccess(response.data.message || 'Stylist created successfully!');
-      setFormData({
-        username: '',
-        email: '',
-        password: '',
-        image: null,
-        secondaryRole: 'Hair Style',
-        description: ''
-      });
-      
-      // Clear file input
-      const fileInput = document.querySelector('input[type="file"]');
-      if (fileInput) fileInput.value = '';
-      
+      setFormData({ username: '', email: '', password: '', image: null });
       fetchStylists();
     } catch (err) {
       console.error('Error creating stylist:', err);
@@ -125,45 +91,26 @@ const AdminStylists = () => {
   };
 
   const handleDelete = async (id) => {
-    // Ask for confirmation before deleting
-    if (!window.confirm("Are you sure you want to delete this stylist? This action cannot be undone.")) {
-      return;
-    }
-
+    if (!window.confirm('Are you sure you want to delete this stylist?')) return;
     try {
-      setDeletingId(id);
+      setLoading(true);
       setError('');
       setSuccess('');
-
-      const response = await axios.delete(
-        `http://localhost:5001/api/stylists/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-
+      const response = await axios.delete(`http://localhost:5001/api/stylists/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setSuccess(response.data.message || 'Stylist deleted successfully!');
-      
-      // Refresh the list of stylists
       fetchStylists();
     } catch (err) {
       console.error('Error deleting stylist:', err);
-      let errorMessage = 'Failed to delete stylist. Please try again.';
-      
-      if (err.response) {
-        console.error('Response data:', err.response.data);
-        console.error('Response status:', err.response.status);
-        errorMessage = err.response.data?.message || errorMessage;
-      } else if (err.request) {
-        console.error('No response received:', err.request);
-        errorMessage = 'No response from server. Please check your connection.';
-      }
-      
+      const errorMessage = err.response?.data?.message || 'Failed to delete stylist. Please try again.';
       setError(errorMessage);
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        localStorage.removeItem('token');
+        navigate('/');
+      }
     } finally {
-      setDeletingId(null);
+      setLoading(false);
     }
   };
 
@@ -232,7 +179,7 @@ const AdminStylists = () => {
         <h2>Create New Stylist</h2>
         <input
           type="text"
-          placeholder="Full Name (e.g. Alex Doe)"
+          placeholder="Username"
           value={formData.username}
           onChange={(e) => setFormData({ ...formData, username: e.target.value })}
           required
@@ -254,31 +201,12 @@ const AdminStylists = () => {
           required
           disabled={loading}
         />
-        <select
-          value={formData.secondaryRole}
-          onChange={(e) => setFormData({ ...formData, secondaryRole: e.target.value })}
-          disabled={loading}
-          className="role-dropdown"
-        >
-          <option value="Hair Style">Hair Style</option>
-          <option value="Make Up">Make Up</option>
-          <option value="Massage">Massage</option>
-        </select>
-        <textarea
-          placeholder="Stylist description"
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          disabled={loading}
-          className="stylist-description"
-          rows="4"
-        />
         <input
           type="file"
           accept="image/*"
           onChange={handleFileChange}
           disabled={loading}
         />
-        <p className="file-hint">Image is optional. Only JPEG/PNG files accepted.</p>
         <button type="submit" disabled={loading}>
           {loading ? 'Creating...' : 'Create Stylist'}
         </button>
@@ -292,9 +220,8 @@ const AdminStylists = () => {
           <thead>
             <tr>
               <th>Image</th>
-              <th>Name</th>
+              <th>Username</th>
               <th>Email</th>
-              <th>Specialty</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -314,7 +241,6 @@ const AdminStylists = () => {
                 </td>
                 <td>{stylist.username}</td>
                 <td>{stylist.email}</td>
-                <td>{stylist.secondaryRole || 'Not specified'}</td>
                 <td>
                   <button
                     onClick={() => handleEdit(stylist._id, stylist.username, stylist.email)}
@@ -322,16 +248,10 @@ const AdminStylists = () => {
                   >
                     Edit
                   </button>
-                  <button 
-                    onClick={() => handleDelete(stylist._id)} 
-                    disabled={loading || deletingId === stylist._id}
-                  >
-                    {deletingId === stylist._id ? 'Deleting...' : 'Delete'}
+                  <button onClick={() => handleDelete(stylist._id)} disabled={loading}>
+                    Delete
                   </button>
-                  <button 
-                    onClick={() => handleResetPassword(stylist._id)} 
-                    disabled={loading}
-                  >
+                  <button onClick={() => handleResetPassword(stylist._id)} disabled={loading}>
                     Reset Password
                   </button>
                 </td>

@@ -19,23 +19,21 @@ router.get('/', verifyAdmin, async (req, res) => {
 
 // Create a new stylist (admin only)
 router.post('/create', verifyAdmin, async (req, res) => {
-  let { username, email, password, secondaryRole, description } = req.body;
-  
+  const { username, email, password } = req.body;
+  const file = req.files?.image;
+
   // Validate required fields
   if (!username || !email || !password) {
     return res.status(400).json({ message: 'All fields (username, email, password) are required.' });
   }
 
+  // Validate file type if provided
+  if (file && !['image/jpeg', 'image/png'].includes(file.mimetype)) {
+    return res.status(400).json({ message: 'Only JPEG/PNG images are allowed' });
+  }
+
   try {
-    // Log the incoming data
-    console.log('Creating stylist with provided data:', { 
-      username, 
-      email, 
-      passwordLength: password ? password.length : 0,
-      secondaryRole, 
-      description,
-      hasImage: req.files && req.files.image ? true : false
-    });
+    console.log('Creating stylist with:', { username, email });
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -58,59 +56,39 @@ router.post('/create', verifyAdmin, async (req, res) => {
 
     // Upload image to Cloudinary if provided
     let imageUrl = '';
-    if (req.files && req.files.image) {
-      const file = req.files.image;
-      
-      // Validate file type
-      if (!['image/jpeg', 'image/png'].includes(file.mimetype)) {
-        return res.status(400).json({ message: 'Only JPEG/PNG images are allowed' });
-      }
-      
-      try {
-        const result = await cloudinary.uploader.upload(file.tempFilePath, {
-          folder: 'stylists',
-        });
-        imageUrl = result.secure_url;
-      } catch (uploadError) {
-        console.error('Error uploading to Cloudinary:', uploadError);
-        // Continue creating the stylist even if image upload fails
-      }
+    if (file) {
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: 'stylists',
+            resource_type: 'image',
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        stream.end(file.data);
+      });
+      imageUrl = result.secure_url;
     }
 
-    // Create new user - explicitly convert to string to avoid null values
+    // Create new user
     const newUser = new User({
-      username: String(username), // Force string conversion
-      email: String(email),
+      username,
+      email,
       password: hashedPassword,
       role: 'stylist',
     });
-    
-    // Log the user object before saving
-    console.log('About to save user:', {
-      username: newUser.username,
-      email: newUser.email,
-      role: newUser.role
-    });
-    
     await newUser.save();
 
     // Create new stylist
     const newStylist = new Stylist({
-      username: String(username), // Force string conversion
-      email: String(email),
+      username,
+      email,
       userId: newUser._id,
       imageUrl,
-      secondaryRole: secondaryRole || '',
-      description: description || ''
     });
-    
-    // Log the stylist object before saving
-    console.log('About to save stylist:', {
-      username: newStylist.username,
-      email: newStylist.email,
-      secondaryRole: newStylist.secondaryRole
-    });
-    
     await newStylist.save();
 
     res.status(201).json({ message: 'Stylist created successfully' });
@@ -182,8 +160,6 @@ router.put('/:id', verifyAdmin, async (req, res) => {
 // Delete a stylist (admin only)
 router.delete('/:id', verifyAdmin, async (req, res) => {
   try {
-    console.log('Deleting stylist with ID:', req.params.id);
-    
     const stylist = await Stylist.findById(req.params.id);
     if (!stylist) {
       console.log('Stylist not found:', req.params.id);
@@ -198,21 +174,17 @@ router.delete('/:id', verifyAdmin, async (req, res) => {
 
     // Delete image from Cloudinary if it exists
     if (stylist.imageUrl) {
-      try {
-        const publicId = stylist.imageUrl.split('/').pop().split('.')[0];
-        await cloudinary.uploader.destroy(`stylists/${publicId}`);
-        console.log('Image deleted from Cloudinary:', publicId);
-      } catch (imageError) {
-        console.error('Error deleting image from Cloudinary:', imageError);
-        // Continue with deletion even if image deletion fails
-      }
+      const publicId = stylist.imageUrl.split('/').pop().split('.')[0];
+      await cloudinary.uploader.destroy(`stylists/${publicId}`);
+      console.log('Image deleted from Cloudinary:', publicId);
     }
 
-    // Delete the stylist and user
+    // Delete both the stylist and the associated user
     await Stylist.findByIdAndDelete(req.params.id);
+    console.log('Stylist deleted:', req.params.id);
     await User.findByIdAndDelete(stylist.userId);
-    
-    console.log('Stylist and user deleted successfully');
+    console.log('Associated user deleted:', stylist.userId);
+
     res.json({ message: 'Stylist deleted successfully' });
   } catch (error) {
     console.error('Error deleting stylist:', error);

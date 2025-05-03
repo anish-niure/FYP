@@ -6,8 +6,6 @@ const notificationSchema = new mongoose.Schema({
   message: { type: String, required: true },
   date: { type: Date, default: Date.now },
   read: { type: Boolean, default: false },
-  type: { type: String, enum: ['order', 'booking', 'general'], default: 'general' },
-  link: { type: String, required: false }
 });
 
 module.exports = mongoose.model('Notification', notificationSchema);
